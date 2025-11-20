@@ -1,8 +1,9 @@
 import httpStatus from "http-status";
 import AppError from "../errors/AppError";
 import { prisma } from "./prisma";
+import { OTPFor } from "@prisma/client";
 
-export const verifyOtp = async (payload: { email: string; otp: string }) => {
+export const verifyOtp = async (payload: { email: string; otp: string }, type: OTPFor) => {
     const userData = await prisma.user.findFirstOrThrow({
         where: {
             email: payload.email,
@@ -14,9 +15,14 @@ export const verifyOtp = async (payload: { email: string; otp: string }) => {
             firstName: true,
             lastName: true,
             email: true,
-            role: true
+            role: true,
+            otpFor: true
         }
     });
+
+    if (type !== userData.otpFor) {
+        throw new AppError(httpStatus.FORBIDDEN, 'Invalid Otp')
+    }
 
     if (!userData.otp || !userData.otpExpiry) {
         throw new AppError(httpStatus.BAD_REQUEST, 'No OTP request found for this email.');

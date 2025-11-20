@@ -16,7 +16,8 @@ export const prisma = new PrismaClient({
             emailVerificationTokenExpires: true,
             isAgreeWithTerms: true
         },
-    }
+    },
+
 });
 
 export const insecurePrisma = new PrismaClient({

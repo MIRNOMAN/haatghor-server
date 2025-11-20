@@ -14,8 +14,13 @@ model User {
 
   isAgreeWithTerms Boolean
   profile          String?
-  otp              String?
-  otpExpiry        DateTime?
+
+  otp       String?
+  otpFor    OTPFor?
+  otpExpiry DateTime?
+
+  passwordResetToken        String?
+  passwordResetTokenExpires DateTime?
 
   isEmailVerified               Boolean   @default(false)
   emailVerificationToken        String?
@@ -29,6 +34,12 @@ model User {
   updatedAt        DateTime           @updatedAt
 
   @@map("users")
+}
+
+enum OTPFor {
+  USER_VERIFICATION
+  FORGOT_PASSWORD
+  NOT
 }
 
 enum UserRoleEnum {

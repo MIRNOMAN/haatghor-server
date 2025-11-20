@@ -4,12 +4,17 @@ import { MessageRouters } from '../modules/Messages/message.route';
 import { NotificationsRouters } from '../modules/Notification/notification.route';
 import { AuthRouters } from '../modules/Auth/auth.routes';
 import { AssetRouters } from '../modules/Asset/asset.route';
+import { AuthByOtpRouters } from '../modules/AuthByOtp/auth.routes';
 const router = express.Router();
 
 const moduleRoutes = [
+  // {
+  //   path: '/auth',
+  //   route: AuthRouters,
+  // },
   {
     path: '/auth',
-    route: AuthRouters,
+    route: AuthByOtpRouters,
   },
   {
     path: '/users',
