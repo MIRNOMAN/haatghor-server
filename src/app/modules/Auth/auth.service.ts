@@ -5,7 +5,7 @@ import config from '../../../config';
 import AppError from '../../errors/AppError';
 import { generateToken } from '../../utils/generateToken';
 import { insecurePrisma, prisma } from '../../utils/prisma';
-import { User } from '@/prisma/schema/generated/prisma/enums';
+import { User } from '@/generated/enums';
 import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { verifyToken } from '../../utils/verifyToken';

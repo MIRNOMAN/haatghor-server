@@ -4,7 +4,7 @@ import { prisma } from '../../utils/prisma';
 import { ICreateOrder, IOrderFilters, IUpdateOrderStatus } from './order.interface';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
-import { Prisma } from '@/prisma/schema/generated/prisma/enums';
+import { Prisma } from '@/generated/enums';
 import { nanoid } from 'nanoid';
 
 const createOrder = async (userId: string, payload: ICreateOrder) => {

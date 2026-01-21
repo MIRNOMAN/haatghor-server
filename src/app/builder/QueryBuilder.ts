@@ -26,7 +26,7 @@ class QueryBuilder<
         ...this.prismaQuery.where,
         OR: searchableFields.map(field => {
           if (field.includes('.')) {
-            const [parentField, childField] = field.split('.');
+            const [parentField, childField] = field.split('.') as [string, string];
             return { [parentField]: { [childField]: { contains: searchTerm, mode: 'insensitive' } } };
           }
           return { [field]: { contains: searchTerm, mode: 'insensitive' } };

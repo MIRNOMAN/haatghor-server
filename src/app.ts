@@ -32,11 +32,11 @@ app.use(express.json({ limit: "500mb" }));
 app.use(express.urlencoded({ limit: "500mb", extended: true }));
 
 app.get("/", (req: Request, res: Response) => {
-  res.send(html('Initial Project (Server)'));
+  res.send(html('HaatGhor Backend is running 🚀'));
 });
 
 
-// app.use("/api/v1", router);
+app.use("/api/v1", router);
 
 app.use(globalErrorHandler);
 app.use('/upload', express.static(path.join(__dirname, 'app', 'upload')));

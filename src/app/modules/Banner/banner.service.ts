@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { prisma } from '../../utils/prisma';
 import { IBanner, IUpdateBanner, IBannerFilters } from './banner.interface';
-import { Prisma } from '@/prisma/schema/generated/prisma/enums';
+import { Prisma } from '@/generated/enums';
 
 const createBanner = async (payload: IBanner) => {
   const result = await prisma.banner.create({

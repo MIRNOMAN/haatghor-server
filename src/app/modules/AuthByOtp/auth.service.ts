@@ -4,7 +4,7 @@ import { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 import config from '../../../config';
 import AppError from '../../errors/AppError';
 import { insecurePrisma, prisma } from '../../utils/prisma';
-import { OTPFor, User } from '@/prisma/schema/generated/prisma/enums';
+import { OTPFor, User } from '@/generated/enums';
 import { Response } from 'express';
 import jwt from 'jsonwebtoken'
 import { generateToken } from '../../utils/generateToken';

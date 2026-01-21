@@ -4,7 +4,7 @@ import { prisma } from '../../utils/prisma';
 import { IProduct, IProductFilters } from './product.interface';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
-import { Prisma } from '@/prisma/schema/generated/prisma/enums';
+import { Prisma } from '@/generated/enums';
 
 const createProduct = async (payload: IProduct) => {
   // Generate slug from name

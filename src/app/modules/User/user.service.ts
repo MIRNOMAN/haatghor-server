@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import { User, UserRoleEnum, UserStatus } from '@/prisma/schema/generated/prisma/enums';
+import {  UserRoleEnum, UserStatus } from '@/generated/enums';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { prisma } from '../../utils/prisma';
 import { Request } from 'express';
@@ -7,6 +7,7 @@ import AppError from '../../errors/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 import { deleteFromCloudStorage, uploadToCloudStorage } from '../../utils/uploadToDigitalOceanAWS';
 import { uploadToMinIO } from '../../utils/uploadToMinio';
+import { User } from '@/generated/client';
 
 
 interface UserWithOptionalPassword extends Omit<User, 'password'> {

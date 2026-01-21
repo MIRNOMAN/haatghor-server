@@ -1,4 +1,4 @@
-import { ProductStatus } from '@/prisma/schema/generated/prisma/enums';
+import { ProductStatus } from '@/generated/enums';
 
 export interface IVariant {
   name: string;

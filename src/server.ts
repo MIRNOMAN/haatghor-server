@@ -8,7 +8,7 @@ const port = config.port || 5000;
 
 async function main() {
   const server: HTTPServer = createServer(app).listen(port, () => {
-    customConsole(port, 'Initial Project (Server)');
+    customConsole(port, 'HaatGhor Backend Server is running on port');
     seedSuperAdmin();
   });
 

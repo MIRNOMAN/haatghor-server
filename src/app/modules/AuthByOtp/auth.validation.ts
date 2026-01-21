@@ -1,4 +1,4 @@
-import { UserRoleEnum } from '@/prisma/schema/generated/prisma/enums';
+import { UserRoleEnum } from '@/generated/enums';
 import z from 'zod';
 
 const loginUser = z.object({

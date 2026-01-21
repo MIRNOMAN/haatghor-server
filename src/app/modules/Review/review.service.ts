@@ -5,7 +5,7 @@ import { IReview, IUpdateReview, IReviewFilters } from './review.interface';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
 import { ProductService } from '../Product/product.service';
-import { Prisma } from '@/prisma/schema/generated/prisma/enums';
+import { Prisma } from '@/generated/enums';
 
 const createReview = async (userId: string, payload: IReview) => {
   // Check if product exists

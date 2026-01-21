@@ -4,8 +4,8 @@ import { Secret } from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../errors/AppError';
 import { verifyToken } from '../utils/verifyToken';
-import { UserRoleEnum } from '@/prisma/schema/generated/prisma/enums';
 import { insecurePrisma } from '../utils/prisma';
+import { UserRoleEnum } from '@/generated/enums';
 
 type TupleHasDuplicate<T extends readonly unknown[]> =
   T extends [infer F, ...infer R]

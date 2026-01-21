@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { prisma }  from '../../utils/prisma';
-import { Message } from '@/prisma/schema/generated/prisma/enums';
+import { Message } from '@/generated/enums';
 import { getSocket } from '../../utils/socket';
 
 

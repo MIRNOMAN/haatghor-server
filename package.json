@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "prisma": {
+    "schema": "./prisma/schema/schema.prisma"
+  },
   "scripts": {
     "start": "bun ./dist/server.js",
     "dev": "bun --watch src/server.ts",

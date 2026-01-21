@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 import { WebSocket, WebSocketServer } from "ws";
 import { prisma } from '../../utils/prisma';
 import { getConversationsForUser, getRoomImage, readAll } from './socket.utils';
-import { Message } from '@/prisma/schema/generated/prisma/enums';
+import { Message } from '@/generated/enums';
 import { Conversation } from './socket.validation';
 import { checkRoles, socketAuth } from '../../middlewares/socketAuth';
 

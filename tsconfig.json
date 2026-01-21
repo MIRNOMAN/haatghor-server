@@ -30,7 +30,7 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["src/*"],
 
       "@/prisma/*": ["./prisma/generated/*"],
       "@/generated/*": ["./src/generated/*"]

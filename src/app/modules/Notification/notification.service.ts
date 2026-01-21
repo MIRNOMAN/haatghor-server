@@ -1,4 +1,4 @@
-import { NotificationType, NotificationUser, User } from '@/prisma/schema/generated/prisma/enums';
+import { NotificationType, NotificationUser, User } from '@/generated/enums';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { getSocket } from '../../utils/socket';
 import { prisma } from '../../utils/prisma';
