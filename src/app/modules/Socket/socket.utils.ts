@@ -1,4 +1,4 @@
-import { Room } from "@prisma/client";
+import { Room } from "@/prisma/schema/generated/prisma/enums";
 import { prisma } from "../../utils/prisma";
 import { WebSocket } from "ws";
 import { Conversation } from "./socket.validation";

@@ -1,4 +1,5 @@
-import { BillingCycle } from '@prisma/client';
+
+import { BillingCycle } from '@/prisma/schema/generated/prisma/enums';
 import z from 'zod';
 
 

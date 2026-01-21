@@ -1,11 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/prisma/schema/generated/prisma/client";
+
 
 export const prisma = new PrismaClient({
-    datasources: {
-        db: {
-            url: process.env.DATABASE_URL
-        }
-    },
+    accelerateUrl: process.env.DATABASE_URL!,
     omit: {
         user: {
             password: true,
@@ -21,11 +18,7 @@ export const prisma = new PrismaClient({
 });
 
 export const insecurePrisma = new PrismaClient({
-    datasources: {
-        db: {
-            url: process.env.DATABASE_URL
-        }
-    },
+    accelerateUrl: process.env.DATABASE_URL!,
 
 })
 

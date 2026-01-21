@@ -1,0 +1,35 @@
+model Product {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String        @unique
+  description String
+  categoryId  String        @db.ObjectId
+  brand       String?
+  images      String[]
+  price       Float
+  discount    Float         @default(0)
+  stock       Int           @default(0)
+  status      ProductStatus @default(ACTIVE)
+  variants    Variant[]
+  rating      Float         @default(0)
+  totalReviews Int          @default(0)
+  isFeatured  Boolean       @default(false)
+  tags        String[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  category   Category      @relation(fields: [categoryId], references: [id])
+  reviews    Review[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  wishlist   Wishlist[]
+
+  @@map("products")
+}
+
+type Variant {
+  name  String  // e.g., "Color", "Size", "RAM"
+  value String  // e.g., "Red", "L", "8GB"
+  price Float?  // Additional price for this variant
+  stock Int?    // Stock for this variant
+}

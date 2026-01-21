@@ -1,6 +1,6 @@
 import express from 'express';
 import auth from '../../middlewares/auth';
-import { UserRoleEnum } from '@prisma/client';
+import { UserRoleEnum } from '@/prisma/schema/generated/prisma/enums';
 import { notificationsControllers } from './notification.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import { notificationValidation } from './notification.validation';

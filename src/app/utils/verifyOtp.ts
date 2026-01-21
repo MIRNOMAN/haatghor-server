@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
 import AppError from "../errors/AppError";
 import { prisma } from "./prisma";
-import { OTPFor } from "@prisma/client";
+import { OTPFor } from "@/prisma/schema/generated/prisma/enums";
 
 export const verifyOtp = async (payload: { email: string; otp: string }, type: OTPFor) => {
     const userData = await prisma.user.findFirstOrThrow({

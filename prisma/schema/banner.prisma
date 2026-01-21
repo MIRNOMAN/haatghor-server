@@ -1,0 +1,20 @@
+model Banner {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  subtitle    String?
+  image       String
+  link        String?
+  position    Int          @default(0)
+  isActive    Boolean      @default(true)
+  type        BannerType   @default(HOME)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("banners")
+}
+
+enum BannerType {
+  HOME
+  CATEGORY
+  PROMOTIONAL
+}

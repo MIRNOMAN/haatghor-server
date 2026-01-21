@@ -92,6 +92,30 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 
+const googleOAuth = catchAsync(async (req, res) => {
+  const { generateGoogleAuthUrl } = await import('../../utils/googleAuth');
+  const url = generateGoogleAuthUrl();
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Google OAuth URL generated successfully',
+    data: { url },
+  });
+});
+
+const googleOAuthCallback = catchAsync(async (req, res) => {
+  const { code } = req.query;
+  
+  if (!code || typeof code !== 'string') {
+    throw new Error('Authorization code is missing');
+  }
+
+  const result = await AuthServices.googleOAuthLogin(code);
+  
+  // Redirect to frontend with token
+  res.redirect(`${process.env.BASE_URL_CLIENT}/auth/google/success?token=${result.accessToken}`);
+});
+
 export const AuthControllers = {
   loginUser,
   registerUser,
@@ -101,5 +125,7 @@ export const AuthControllers = {
   forgetPassword,
   verifyForgotPassOtp,
   resetPassword,
-  refreshToken
+  refreshToken,
+  googleOAuth,
+  googleOAuthCallback,
 };

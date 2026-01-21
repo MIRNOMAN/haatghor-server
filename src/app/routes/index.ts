@@ -6,6 +6,16 @@ import { AssetRouters } from '../modules/Asset/asset.route';
 import { AuthByOtpRouters } from '../modules/AuthByOtp/auth.routes';
 import { SubscriptionRoutes } from '../modules/Subscription/subscription.route';
 import { PaymentRoutes } from '../modules/Payment/payment.route';
+import { CategoryRoutes } from '../modules/Category/category.route';
+import { ProductRoutes } from '../modules/Product/product.route';
+import { CartRoutes } from '../modules/Cart/cart.route';
+import { OrderRoutes } from '../modules/Order/order.route';
+import { ReviewRoutes } from '../modules/Review/review.route';
+import { WishlistRoutes } from '../modules/Wishlist/wishlist.route';
+import { AddressRoutes } from '../modules/Address/address.route';
+import { BannerRoutes } from '../modules/Banner/banner.route';
+import { AdminRoutes } from '../modules/Admin/admin.route';
+
 const router = express.Router();
 
 const moduleRoutes = [
@@ -33,7 +43,6 @@ const moduleRoutes = [
     path: '/assets',
     route: AssetRouters,
   },
- 
   {
     path: '/subscriptions',
     route: SubscriptionRoutes,
@@ -41,6 +50,43 @@ const moduleRoutes = [
   {
     path: '/payments',
     route: PaymentRoutes,
+  },
+  // eCommerce Routes
+  {
+    path: '/categories',
+    route: CategoryRoutes,
+  },
+  {
+    path: '/products',
+    route: ProductRoutes,
+  },
+  {
+    path: '/cart',
+    route: CartRoutes,
+  },
+  {
+    path: '/orders',
+    route: OrderRoutes,
+  },
+  {
+    path: '/reviews',
+    route: ReviewRoutes,
+  },
+  {
+    path: '/wishlist',
+    route: WishlistRoutes,
+  },
+  {
+    path: '/addresses',
+    route: AddressRoutes,
+  },
+  {
+    path: '/banners',
+    route: BannerRoutes,
+  },
+  {
+    path: '/admin',
+    route: AdminRoutes,
   },
 ];
 

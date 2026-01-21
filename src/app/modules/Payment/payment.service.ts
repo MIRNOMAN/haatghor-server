@@ -1,4 +1,4 @@
-import { UserRoleEnum } from '@prisma/client';
+import { UserRoleEnum } from '@/prisma/schema/generated/prisma/enums';
 import httpStatus from 'http-status';
 import { prisma } from '../../utils/prisma';
 import AppError from '../../errors/AppError';

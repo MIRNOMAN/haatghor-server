@@ -6,7 +6,7 @@ import Stripe from 'stripe';
 import { stripe } from './stripe';
 import config from '../../config';
 import { prisma } from './prisma';
-import { PaymentType, UserRoleEnum } from '@prisma/client';
+import { PaymentType, UserRoleEnum } from '@/prisma/schema/generated/prisma/enums';
 
 interface CheckoutParams {
     email: string;
@@ -134,7 +134,7 @@ const StripeHook = async (rawBody: Buffer, signature: string | string[] | undefi
 export const subscriptionCheckout = async ({ email, paymentId, productId, role }: SubscriptionCheckoutParams) => {
     const prices = await stripe.prices.list({ product: productId, limit: 1 });
     if (!prices.data.length) throw new Error('No price found for this product.');
-    const priceId = prices.data[0].id;
+    const priceId = prices.data[0]?.id;
 
     const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
@@ -202,8 +202,8 @@ const handleCheckoutSessionPayment = async (session: Stripe.Checkout.Session | S
 const handleSubscriptionPayment = async (subscription: Stripe.Subscription) => {
     const paymentId = subscription.metadata?.paymentId;
     const subscriptionItem = subscription.items.data[0];
-    const periodStart = new Date(subscriptionItem.current_period_start * 1000);
-    const periodEnd = new Date(subscriptionItem.current_period_end * 1000);
+    const periodStart = new Date(subscriptionItem?.current_period_start ?? 0 * 1000);
+    const periodEnd = new Date(subscriptionItem?.current_period_end ?? 0 * 1000);
     if (!paymentId) return null;
 
     const unitAmount = subscriptionItem?.price.unit_amount ?? 0;

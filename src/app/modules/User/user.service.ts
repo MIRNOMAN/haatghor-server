@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import { User, UserRoleEnum, UserStatus } from '@prisma/client';
+import { User, UserRoleEnum, UserStatus } from '@/prisma/schema/generated/prisma/enums';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { prisma } from '../../utils/prisma';
 import { Request } from 'express';

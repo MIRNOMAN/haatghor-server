@@ -32,6 +32,14 @@ model User {
   payments         Payment[]
   transactions     Transaction[]
   notifications    NotificationUser[]
+  
+  // eCommerce Relations
+  cart             Cart?
+  orders           Order[]
+  reviews          Review[]
+  wishlist         Wishlist[]
+  addresses        Address[]
+  
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 

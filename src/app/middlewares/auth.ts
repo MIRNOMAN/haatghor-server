@@ -4,7 +4,7 @@ import { Secret } from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../errors/AppError';
 import { verifyToken } from '../utils/verifyToken';
-import { UserRoleEnum } from '@prisma/client';
+import { UserRoleEnum } from '@/prisma/schema/generated/prisma/enums';
 import { insecurePrisma } from '../utils/prisma';
 
 type TupleHasDuplicate<T extends readonly unknown[]> =

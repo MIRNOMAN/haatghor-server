@@ -4,7 +4,7 @@ import { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 import config from '../../../config';
 import AppError from '../../errors/AppError';
 import { insecurePrisma, prisma } from '../../utils/prisma';
-import { OTPFor, User } from '@prisma/client';
+import { OTPFor, User } from '@/prisma/schema/generated/prisma/enums';
 import { Response } from 'express';
 import jwt from 'jsonwebtoken'
 import { generateToken } from '../../utils/generateToken';
@@ -442,6 +442,48 @@ const forgetPassword = async (email: string) => {
   return { message: 'Verification otp sent successfully. Please check your inbox.', otp };
 };
 
+const googleOAuthLogin = async (code: string) => {
+  const { getGoogleUser } = await import('../../utils/googleAuth');
+  
+  const googleUser = await getGoogleUser(code);
+
+  if (!googleUser.verified_email) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Google email not verified');
+  }
+
+  // Check if user exists
+  let user = await prisma.user.findUnique({
+    where: { email: googleUser.email },
+  });
+
+  if (!user) {
+    // Create new user
+    const randomPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(randomPassword, 12);
+
+    user = await prisma.user.create({
+      data: {
+        email: googleUser.email,
+        firstName: googleUser.given_name,
+        lastName: googleUser.family_name || googleUser.given_name,
+        password: hashedPassword,
+        profilePhoto: googleUser.picture,
+        isEmailVerified: true,
+        role: 'USER',
+        phoneNumber: `google_${googleUser.id}`, // Temporary phone number
+        isAgreeWithTerms: true,
+      },
+    });
+  } else if (user.isDeleted) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Account has been deleted');
+  } else if (user.status === 'BLOCKED') {
+    throw new AppError(httpStatus.FORBIDDEN, 'Account has been blocked');
+  }
+
+  const result = await refreshToken(user.email, user);
+  return result;
+};
+
 export const AuthServices = {
   loginUserFromDB,
   registerUserIntoDB,
@@ -451,5 +493,6 @@ export const AuthServices = {
   resendVerificationOtpToNumber,
   verifyEmail,
   verifyForgotPassOtp,
-  refreshToken
+  refreshToken,
+  googleOAuthLogin,
 };

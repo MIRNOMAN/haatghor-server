@@ -36,7 +36,7 @@ const getAllVisibleSubscriptions = catchAsync(async (req, res) => {
 
 const getSingleSubscription = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await SubscriptionService.getSingle(id, false);
+  const result = await SubscriptionService.getSingle(id! , false);  
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -49,7 +49,7 @@ const getSingleSubscription = catchAsync(async (req, res) => {
 
 const getSingleSubscriptionWithAdminData = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await SubscriptionService.getSingle(id, true);
+  const result = await SubscriptionService.getSingle(id !, true);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -61,7 +61,7 @@ const getSingleSubscriptionWithAdminData = catchAsync(async (req, res) => {
 const updateSubscription = catchAsync(async (req, res) => {
   const { id } = req.params;
   const payload = req.body;
-  const result = await SubscriptionService.updateSingle(id, payload);
+  const result = await SubscriptionService.updateSingle(id!, payload);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -72,7 +72,7 @@ const updateSubscription = catchAsync(async (req, res) => {
 
 const deleteSubscription = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await SubscriptionService.deleteSingle(id);
+  const result = await SubscriptionService.deleteSingle(id!);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

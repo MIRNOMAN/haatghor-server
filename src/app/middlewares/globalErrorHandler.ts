@@ -1,6 +1,6 @@
 import {
   Prisma
-} from '@prisma/client';
+} from '@/prisma/schema/generated/prisma/enums';
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import AppError from '../errors/AppError';

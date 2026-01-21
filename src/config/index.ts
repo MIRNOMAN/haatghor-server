@@ -37,5 +37,24 @@ export default {
     published_key: process.env.STRIPE_PUBLISHED_KEY,
     stripe_secret_key: process.env.STRIPE_SECRET_KEY,
     stripe_webhook: process.env.STRIPE_WEBHOOK
-  }
+  },
+  google: {
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    callback_url: process.env.GOOGLE_CALLBACK_URL,
+  },
+  bkash: {
+    base_url: process.env.BKASH_BASE_URL,
+    app_key: process.env.BKASH_APP_KEY,
+    app_secret: process.env.BKASH_APP_SECRET,
+    username: process.env.BKASH_USERNAME,
+    password: process.env.BKASH_PASSWORD,
+  },
+  nagad: {
+    base_url: process.env.NAGAD_BASE_URL,
+    merchant_id: process.env.NAGAD_MERCHANT_ID,
+    merchant_number: process.env.NAGAD_MERCHANT_NUMBER,
+    public_key: process.env.NAGAD_PUBLIC_KEY,
+    private_key: process.env.NAGAD_PRIVATE_KEY,
+  },
 };
