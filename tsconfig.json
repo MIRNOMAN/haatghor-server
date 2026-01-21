@@ -7,13 +7,9 @@
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
- 
-    // Bundler mode
-    "moduleResolution": "node",
-    "allowImportingTsExtensions": false,
-    // "verbatimModuleSyntax": true,
+
     "noEmit": false,
- 
+
     // Best practices
     "strict": true,
     "skipLibCheck": true,
@@ -21,20 +17,23 @@
     "allowSyntheticDefaultImports": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
- 
+
+    // CHANGE THESE TWO LINES:
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": false,
+
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
- 
+
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/env": ["./src/config/env.ts"],
-      "@/prisma/*": ["./prisma/*"]
+
+      "@/prisma/*": ["./prisma/generated/*"],
+      "@/generated/*": ["./src/generated/*"]
     }
   }
 }
- 
- 

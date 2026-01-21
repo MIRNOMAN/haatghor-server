@@ -2,18 +2,14 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "prisma": {
-    "schema": "./prisma"
-  },
+  "main": "server.js",
   "scripts": {
     "start": "bun ./dist/server.js",
-    "dev": "bun run ./src/server.ts --watch",
+    "dev": "bun --watch src/server.ts",
     "pm": "bun prisma migrate dev",
     "pg": "bun prisma generate",
     "generate-module": "bun run tsx generate-module.ts",
-    "build": "tsc && bun prisma generate",
-    "postinstall": "bun prisma generate",
+    "build": "bun prisma generate && tsc ",
     "lint:check": "eslint --ignore-path .eslintignore --ext .js,.ts .",
     "lint:fix": "eslint . --fix",
     "prettier:check": "prettier --ignore-path .gitignore --check \"**/*.+(js|ts|json)\"",
@@ -43,7 +39,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.936.0",
     "@aws-sdk/lib-storage": "^3.936.0",
-    "@/prisma/schema/generated/prisma/enums": "^7.2.0",
+    "@prisma/client": "7.2.0",
+    "@prisma/client-runtime-utils": "^7.2.0",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",

@@ -4,3 +4,8 @@ node_modules
 .vercel
 generate-module.ts
 dist
+
+/generated/prisma/
+/src/app/generated/
+/src/generated/
+/uploads/

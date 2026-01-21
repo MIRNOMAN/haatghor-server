@@ -1,12 +1,12 @@
-import {
-  Prisma
-} from '@/prisma/schema/generated/prisma/enums';
+import { Prisma } from '@/generated/client';
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import AppError from '../errors/AppError';
 import handleZodError from '../errors/handleZodError';
 
-const handlePrismaValidationError = (err: Prisma.PrismaClientValidationError) => {
+const handlePrismaValidationError = (
+  err: Prisma.PrismaClientValidationError,
+) => {
   const rawMessage = err.message || 'Prisma validation error occurred.';
   let cleanMessage = 'Validation error in Prisma operation';
   let suggestion = '';
@@ -17,8 +17,10 @@ const handlePrismaValidationError = (err: Prisma.PrismaClientValidationError) =>
     cleanMessage = `Prisma error: The "${field}" field is required in the create/update query.`;
     suggestion = `Example: prisma.alert.create({ data: { ${field}: "Your value", ...otherFields } })`;
   } else if (rawMessage.includes('Argument `data` is missing')) {
-    cleanMessage = 'Prisma error: The "data" property is required in create/update queries.';
-    suggestion = 'Example: prisma.alert.create({ data: { title: "Your title", ... } })';
+    cleanMessage =
+      'Prisma error: The "data" property is required in create/update queries.';
+    suggestion =
+      'Example: prisma.alert.create({ data: { title: "Your title", ... } })';
   } else if (rawMessage.includes('Unknown arg')) {
     cleanMessage = 'Prisma error: You passed an invalid field to the query.';
     suggestion = 'Check your field names in the `data` object.';
@@ -54,13 +56,17 @@ const globalErrorHandler = (
   } else if (err?.code === 'P2003') {
     statusCode = 400;
     message = `Foreign key constraint failed on the field: ${err.meta?.field_name}`;
-    errorDetails = { code: err.code, field: err.meta?.field_name, model: err.meta?.modelName };
+    errorDetails = {
+      code: err.code,
+      field: err.meta?.field_name,
+      model: err.meta?.modelName,
+    };
   } else if (err?.code === 'P2011') {
     statusCode = 400;
     message = `Null constraint violation on the field: ${err.meta?.field_name}`;
     errorDetails = { code: err.code, field: err.meta?.field_name };
   } else if (err?.code === 'P2025') {
-    console.log(err)
+    console.log(err);
     statusCode = 404;
     message = `${err?.meta?.modelName} Not Found!!`;
     errorDetails = { code: err.code, cause: err.meta?.cause };
@@ -96,7 +102,7 @@ const globalErrorHandler = (
     success: false,
     message,
     errorDetails,
-    statusCode: statusCode
+    statusCode: statusCode,
   });
 };
 

@@ -1,8 +1,7 @@
-
+import { UserRoleEnum } from '@/generated/enums';
 import * as bcrypt from 'bcrypt';
 import config from '../../config';
 import { prisma } from '../utils/prisma';
-import { UserRoleEnum } from '@/prisma/schema/generated/prisma/enums';
 
 const superAdminData = {
   firstName: 'Super',
