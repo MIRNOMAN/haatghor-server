@@ -1,4 +1,4 @@
-import { NotificationType } from 'prisma/src/generated/prisma/enums';
+import { NotificationType } from '@prisma/client';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { prisma } from '../../utils/prisma';
 import { getSocket } from '../../utils/socket';

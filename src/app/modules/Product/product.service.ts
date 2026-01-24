@@ -1,5 +1,5 @@
+import { Prisma } from '@prisma/client';
 import httpStatus from 'http-status';
-import { Prisma } from 'prisma/src/generated/prisma/enums';
 import AppError from '../../errors/AppError';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';

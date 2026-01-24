@@ -1,8 +1,8 @@
+import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
 import httpStatus from 'http-status';
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
-import { User } from 'prisma/src/generated/prisma/enums';
 import config from '../../../config';
 import AppError from '../../errors/AppError';
 import { generateToken } from '../../utils/generateToken';

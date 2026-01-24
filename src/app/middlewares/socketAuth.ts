@@ -1,5 +1,5 @@
 // wsAuth.ts
-import { User, UserRoleEnum } from 'prisma/src/generated/prisma/enums';
+import { User, UserRoleEnum } from '@prisma/client';
 import config from '../../config';
 import { insecurePrisma } from '../utils/prisma';
 import { verifyToken } from '../utils/verifyToken';

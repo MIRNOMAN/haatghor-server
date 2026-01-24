@@ -1,5 +1,5 @@
+import { PaymentType, UserRoleEnum } from '@prisma/client';
 import httpStatus from 'http-status';
-import { PaymentType, UserRoleEnum } from 'prisma/src/generated/prisma/enums';
 import Stripe from 'stripe';
 import config from '../../config';
 import AppError from '../errors/AppError';

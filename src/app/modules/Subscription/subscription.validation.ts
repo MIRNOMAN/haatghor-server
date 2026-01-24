@@ -1,4 +1,4 @@
-import { BillingCycle } from 'prisma/src/generated/prisma/enums';
+import { BillingCycle } from '@prisma/client';
 import z from 'zod';
 
 const createSubscription = z.object({

@@ -1,8 +1,4 @@
-import {
-  OrderStatus,
-  PaymentMethod,
-  PaymentStatus,
-} from 'prisma/src/generated/prisma/enums';
+import { OrderStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
 
 export interface IShippingAddress {
   fullName: string;

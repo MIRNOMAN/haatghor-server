@@ -1,7 +1,6 @@
-import { PrismaClient } from 'prisma/src/generated/prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 export const prisma = new PrismaClient({
-  adapter: null,
   omit: {
     user: {
       password: true,
@@ -15,6 +14,4 @@ export const prisma = new PrismaClient({
   },
 });
 
-export const insecurePrisma = new PrismaClient({
-  adapter: null,
-});
+export const insecurePrisma = new PrismaClient({});

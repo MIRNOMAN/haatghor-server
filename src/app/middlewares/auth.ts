@@ -1,7 +1,7 @@
+import { UserRoleEnum } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { Secret } from 'jsonwebtoken';
-import { UserRoleEnum } from 'prisma/src/generated/prisma/enums';
 import config from '../../config';
 import AppError from '../errors/AppError';
 import { insecurePrisma } from '../utils/prisma';

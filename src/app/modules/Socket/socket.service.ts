@@ -1,5 +1,5 @@
+import { Message } from '@prisma/client';
 import { Request } from 'express';
-import { Message } from 'prisma/src/generated/prisma/enums';
 import { WebSocket, WebSocketServer } from 'ws';
 import { checkRoles, socketAuth } from '../../middlewares/socketAuth';
 import { prisma } from '../../utils/prisma';

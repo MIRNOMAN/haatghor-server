@@ -1,5 +1,5 @@
+import { Message } from '@prisma/client';
 import httpStatus from 'http-status';
-import { Message } from 'prisma/src/generated/prisma/enums';
 import AppError from '../../errors/AppError';
 import { prisma } from '../../utils/prisma';
 import { getSocket } from '../../utils/socket';

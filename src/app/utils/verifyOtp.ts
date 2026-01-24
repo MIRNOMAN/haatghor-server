@@ -1,5 +1,5 @@
+import { OTPFor } from '@prisma/client';
 import httpStatus from 'http-status';
-import { OTPFor } from 'prisma/src/generated/prisma/enums';
 import AppError from '../errors/AppError';
 import { prisma } from './prisma';
 

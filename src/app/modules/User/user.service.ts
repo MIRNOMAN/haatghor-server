@@ -1,8 +1,8 @@
 import { User } from '@/generated/client';
+import { UserRoleEnum, UserStatus } from '@prisma/client';
 import { Request } from 'express';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
-import { UserRoleEnum, UserStatus } from 'prisma/src/generated/prisma/enums';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
 import { prisma } from '../../utils/prisma';

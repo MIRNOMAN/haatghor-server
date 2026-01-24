@@ -1,4 +1,4 @@
-import { BillingCycle } from 'prisma/src/generated/prisma/enums';
+import { BillingCycle } from '@prisma/client';
 
 export interface CreateSubscriptionPayload {
   name: string;

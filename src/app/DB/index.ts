@@ -1,5 +1,5 @@
+import { UserRoleEnum } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { UserRoleEnum } from 'prisma/src/generated/prisma/enums';
 import config from '../../config';
 import { prisma } from '../utils/prisma';
 
