@@ -8,7 +8,7 @@ import { prisma } from '../../utils/prisma';
 const getAllUsers = catchAsync(async (req, res) => {
  const user = req.user;
   const result = await UserServices.getAllUsersFromDB(req.query, user);
-
+   
     sendResponse(res, {
       statusCode: httpStatus.OK,
       message: 'Users retrieved successfully',

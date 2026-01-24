@@ -20,56 +20,76 @@ class QueryBuilder<
 
   // Search
   search(searchableFields: string[]) {
-    const searchTerm = this.query.searchTerm as string;
+    const searchTerm = this.query.search as string;
+  
     if (searchTerm) {
       this.prismaQuery.where = {
         ...this.prismaQuery.where,
-        OR: searchableFields.map(field => {
+        OR: searchableFields.map((field: string) => {
           if (field.includes('.')) {
-            const [parentField, childField] = field.split('.') as [string, string];
-            return { [parentField]: { [childField]: { contains: searchTerm, mode: 'insensitive' } } };
+            const [parent, child] = field.split('.') as [string, string];
+  
+            return {
+              [parent]: {
+                [child]: {
+                  contains: searchTerm,
+                  mode: 'insensitive',
+                },
+              },
+            };
           }
-          return { [field]: { contains: searchTerm, mode: 'insensitive' } };
+  
+          return {
+            [field]: {
+              contains: searchTerm,
+              mode: 'insensitive',
+            },
+          };
         }),
       };
+  
+      delete this.query.search;
     }
+  
     return this;
   }
+  
 
   // Filter
   filter() {
     const queryObj = { ...this.query };
-    const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields', 'exclude'];
+    const excludeFields = ['search', 'sort', 'limit', 'page', 'fields', 'exclude'];
+  
     excludeFields.forEach(field => delete queryObj[field]);
-
+  
     const formattedFilters: Record<string, unknown> = {};
-
+  
     const setNestedObject = (obj: Record<string, any>, path: string, value: unknown) => {
       const keys = path.split('.');
       let current = obj;
+  
       keys.forEach((key, index) => {
         if (index === keys.length - 1) {
           current[key] = value;
         } else {
-          if (!current[key] || typeof current[key] !== 'object') {
-            current[key] = {};
-          }
+          current[key] ||= {};
           current = current[key];
         }
       });
     };
-
+  
     for (const [key, value] of Object.entries(queryObj)) {
       setNestedObject(formattedFilters, key, value);
     }
-
+  
     this.prismaQuery.where = {
       ...this.prismaQuery.where,
       ...formattedFilters,
     };
-
+  
     return this;
   }
+  
 
 
 

@@ -26,6 +26,7 @@ const getAllUsersFromDB = async (query: any, user: JwtPayload) => {
       firstName: true,
       lastName: true,
       email: true,
+      phoneNumber: true,
       role: true,
       profilePhoto: true,
       ...(user.role === 'SUPERADMIN' && {
