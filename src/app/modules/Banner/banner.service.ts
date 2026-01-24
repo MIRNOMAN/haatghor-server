@@ -1,8 +1,8 @@
 import httpStatus from 'http-status';
+import { Prisma } from 'prisma/src/generated/prisma/enums';
 import AppError from '../../errors/AppError';
 import { prisma } from '../../utils/prisma';
-import { IBanner, IUpdateBanner, IBannerFilters } from './banner.interface';
-import { Prisma } from '@/generated/enums';
+import { IBanner, IBannerFilters, IUpdateBanner } from './banner.interface';
 
 const createBanner = async (payload: IBanner) => {
   const result = await prisma.banner.create({
@@ -28,10 +28,7 @@ const getAllBanners = async (filters?: IBannerFilters) => {
 
   const result = await prisma.banner.findMany({
     where: whereConditions,
-    orderBy: [
-      { position: 'asc' },
-      { createdAt: 'desc' },
-    ],
+    orderBy: [{ position: 'asc' }, { createdAt: 'desc' }],
   });
 
   return result;

@@ -1,8 +1,8 @@
 // wsAuth.ts
-import { insecurePrisma } from "../utils/prisma";
-import { User, UserRoleEnum } from "@/generated/enums";
-import { verifyToken } from "../utils/verifyToken";
-import config from "../../config";
+import { User, UserRoleEnum } from 'prisma/src/generated/prisma/enums';
+import config from '../../config';
+import { insecurePrisma } from '../utils/prisma';
+import { verifyToken } from '../utils/verifyToken';
 
 export type CustomWebSocket = WebSocket & {};
 
@@ -11,7 +11,9 @@ export async function socketAuth(
   token?: string,
 ): Promise<User | null> {
   if (!token) {
-    ws.send(JSON.stringify({ type: "error", message: "You are not authenticated" }));
+    ws.send(
+      JSON.stringify({ type: 'error', message: 'You are not authenticated' }),
+    );
     return null;
   }
 
@@ -19,8 +21,11 @@ export async function socketAuth(
   try {
     decoded = verifyToken(token, config.jwt.access_secret as string);
   } catch (error: any) {
-    const errorMessage = error.name === "TokenExpiredError" ? "Token has expired!" : "Invalid token!";
-    ws.send(JSON.stringify({ type: "error", message: errorMessage }));
+    const errorMessage =
+      error.name === 'TokenExpiredError'
+        ? 'Token has expired!'
+        : 'Invalid token!';
+    ws.send(JSON.stringify({ type: 'error', message: errorMessage }));
     return null;
   }
 
@@ -29,28 +34,38 @@ export async function socketAuth(
       where: { id: decoded.id },
       include: {
         payments: {
-          where: { paymentType: "SUBSCRIPTION", paymentStatus: "SUCCESS" },
-          select: { id: true, paymentStatus: true, subscriptionPackageId: true, endAt: true },
+          where: { paymentType: 'SUBSCRIPTION', paymentStatus: 'SUCCESS' },
+          select: {
+            id: true,
+            paymentStatus: true,
+            subscriptionPackageId: true,
+            endAt: true,
+          },
         },
       },
     });
 
     if (!user || user.isDeleted) {
-      ws.send(JSON.stringify({ type: "error", message: "Your account has been deleted" }));
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          message: 'Your account has been deleted',
+        }),
+      );
       return null;
     }
     if (!user.isEmailVerified) {
-      ws.send(JSON.stringify({ type: "error", message: "Email not verified" }));
+      ws.send(JSON.stringify({ type: 'error', message: 'Email not verified' }));
       return null;
     }
-    if (user.status === "BLOCKED") {
-      ws.send(JSON.stringify({ type: "error", message: "You are blocked" }));
+    if (user.status === 'BLOCKED') {
+      ws.send(JSON.stringify({ type: 'error', message: 'You are blocked' }));
       return null;
     }
 
     return user;
   } catch (err: any) {
-    ws.send(JSON.stringify({ type: "error", message: "Unauthorized" }));
+    ws.send(JSON.stringify({ type: 'error', message: 'Unauthorized' }));
     return null;
   }
 }
@@ -64,10 +79,19 @@ export async function socketAuth(
 //   return true;
 // }
 
-export function checkRoles(ws: any, user: User, roles: (UserRoleEnum | "ANY")[]): boolean {
-  if (roles.includes("ANY")) return true;
+export function checkRoles(
+  ws: any,
+  user: User,
+  roles: (UserRoleEnum | 'ANY')[],
+): boolean {
+  if (roles.includes('ANY')) return true;
   if (!roles.includes(user.role)) {
-    ws.send(JSON.stringify({ type: "error", message: "Forbidden: You do not have access" }));
+    ws.send(
+      JSON.stringify({
+        type: 'error',
+        message: 'Forbidden: You do not have access',
+      }),
+    );
     return false;
   }
   return true;

@@ -1,11 +1,11 @@
 import httpStatus from 'http-status';
+import { Prisma } from 'prisma/src/generated/prisma/enums';
 import AppError from '../../errors/AppError';
-import { prisma } from '../../utils/prisma';
-import { IReview, IUpdateReview, IReviewFilters } from './review.interface';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
+import { prisma } from '../../utils/prisma';
 import { ProductService } from '../Product/product.service';
-import { Prisma } from '@/generated/enums';
+import { IReview, IReviewFilters, IUpdateReview } from './review.interface';
 
 const createReview = async (userId: string, payload: IReview) => {
   // Check if product exists
@@ -28,7 +28,10 @@ const createReview = async (userId: string, payload: IReview) => {
   });
 
   if (existingReview) {
-    throw new AppError(httpStatus.CONFLICT, 'You have already reviewed this product');
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'You have already reviewed this product',
+    );
   }
 
   // Check if user purchased this product (verified purchase)
@@ -83,7 +86,8 @@ const getProductReviews = async (
   filters: IReviewFilters,
   paginationOptions: IPaginationOptions,
 ) => {
-  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
+  const { page, limit, skip, sortBy, sortOrder } =
+    calculatePagination(paginationOptions);
   const { rating, isVerifiedPurchase } = filters;
 
   const andConditions: Prisma.ReviewWhereInput[] = [{ productId }];
@@ -139,7 +143,7 @@ const getProductReviews = async (
     5: 0,
   };
 
-  stats.forEach((stat) => {
+  stats.forEach(stat => {
     ratingStats[stat.rating as keyof typeof ratingStats] = stat._count.rating;
   });
 
@@ -183,7 +187,11 @@ const getReviewById = async (reviewId: string) => {
   return review;
 };
 
-const updateReview = async (reviewId: string, userId: string, payload: IUpdateReview) => {
+const updateReview = async (
+  reviewId: string,
+  userId: string,
+  payload: IUpdateReview,
+) => {
   const review = await prisma.review.findUnique({
     where: { id: reviewId },
   });
@@ -193,7 +201,10 @@ const updateReview = async (reviewId: string, userId: string, payload: IUpdateRe
   }
 
   if (review.userId !== userId) {
-    throw new AppError(httpStatus.FORBIDDEN, 'You can only update your own reviews');
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You can only update your own reviews',
+    );
   }
 
   const result = await prisma.review.update({
@@ -227,7 +238,10 @@ const deleteReview = async (reviewId: string, userId: string) => {
   }
 
   if (review.userId !== userId) {
-    throw new AppError(httpStatus.FORBIDDEN, 'You can only delete your own reviews');
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You can only delete your own reviews',
+    );
   }
 
   const productId = review.productId;

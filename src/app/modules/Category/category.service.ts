@@ -1,22 +1,22 @@
 import httpStatus from 'http-status';
+import { Prisma } from 'prisma/src/generated/prisma/enums';
 import AppError from '../../errors/AppError';
-import { prisma } from '../../utils/prisma';
-import { ICategory, ICategoryFilters } from './category.interface';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
-import { Prisma } from '@/generated/enums';
+import { prisma } from '../../utils/prisma';
+import { ICategory, ICategoryFilters } from './category.interface';
 
 const createCategory = async (payload: ICategory) => {
   // Generate slug from name
-  const slug = payload.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  const slug = payload.name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '');
 
   // Check if category already exists
   const existingCategory = await prisma.category.findFirst({
     where: {
-      OR: [
-        { name: payload.name },
-        { slug },
-      ],
+      OR: [{ name: payload.name }, { slug }],
     },
   });
 
@@ -38,7 +38,8 @@ const getAllCategories = async (
   filters: ICategoryFilters,
   paginationOptions: IPaginationOptions,
 ) => {
-  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
+  const { page, limit, skip, sortBy, sortOrder } =
+    calculatePagination(paginationOptions);
   const { searchTerm, isActive } = filters;
 
   const andConditions: Prisma.CategoryWhereInput[] = [];
@@ -117,7 +118,10 @@ const updateCategory = async (id: string, payload: Partial<ICategory>) => {
 
   // Generate new slug if name is updated
   if (payload.name) {
-    const slug = payload.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+    const slug = payload.name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '');
     payload.slug = slug;
   }
 

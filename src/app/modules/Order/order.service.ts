@@ -1,11 +1,15 @@
 import httpStatus from 'http-status';
+import { nanoid } from 'nanoid';
+import { Prisma } from 'prisma/src/generated/prisma/enums';
 import AppError from '../../errors/AppError';
-import { prisma } from '../../utils/prisma';
-import { ICreateOrder, IOrderFilters, IUpdateOrderStatus } from './order.interface';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
-import { Prisma } from '@/generated/enums';
-import { nanoid } from 'nanoid';
+import { prisma } from '../../utils/prisma';
+import {
+  ICreateOrder,
+  IOrderFilters,
+  IUpdateOrderStatus,
+} from './order.interface';
 
 const createOrder = async (userId: string, payload: ICreateOrder) => {
   // Get user's cart
@@ -32,7 +36,10 @@ const createOrder = async (userId: string, payload: ICreateOrder) => {
     const product = item.product;
 
     if (product.status !== 'ACTIVE') {
-      throw new AppError(httpStatus.BAD_REQUEST, `Product ${product.name} is not available`);
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Product ${product.name} is not available`,
+      );
     }
 
     if (product.stock < item.quantity) {
@@ -61,7 +68,7 @@ const createOrder = async (userId: string, payload: ICreateOrder) => {
   const orderNumber = `ORD-${nanoid(10).toUpperCase()}`;
 
   // Create order in transaction
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async tx => {
     // Create order
     const order = await tx.order.create({
       data: {
@@ -73,14 +80,16 @@ const createOrder = async (userId: string, payload: ICreateOrder) => {
         paymentMethod: payload.paymentMethod,
         shippingAddress: payload.shippingAddress,
         notes: payload.notes,
-        status: payload.paymentMethod === 'CASH_ON_DELIVERY' ? 'PENDING' : 'PENDING',
-        paymentStatus: payload.paymentMethod === 'CASH_ON_DELIVERY' ? 'PENDING' : 'PENDING',
+        status:
+          payload.paymentMethod === 'CASH_ON_DELIVERY' ? 'PENDING' : 'PENDING',
+        paymentStatus:
+          payload.paymentMethod === 'CASH_ON_DELIVERY' ? 'PENDING' : 'PENDING',
       },
     });
 
     // Create order items
     await tx.orderItem.createMany({
-      data: orderItems.map((item) => ({
+      data: orderItems.map(item => ({
         orderId: order.id,
         ...item,
       })),
@@ -141,7 +150,8 @@ const getUserOrders = async (
   filters: IOrderFilters,
   paginationOptions: IPaginationOptions,
 ) => {
-  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
+  const { page, limit, skip, sortBy, sortOrder } =
+    calculatePagination(paginationOptions);
   const { status, paymentStatus } = filters;
 
   const andConditions: Prisma.OrderWhereInput[] = [{ userId }];
@@ -229,14 +239,21 @@ const getOrderById = async (orderId: string, userId?: string) => {
 
   // If userId is provided (for user role), check ownership
   if (userId && order.userId !== userId) {
-    throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized to view this order');
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You are not authorized to view this order',
+    );
   }
 
   return order;
 };
 
-const getAllOrders = async (filters: IOrderFilters, paginationOptions: IPaginationOptions) => {
-  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
+const getAllOrders = async (
+  filters: IOrderFilters,
+  paginationOptions: IPaginationOptions,
+) => {
+  const { page, limit, skip, sortBy, sortOrder } =
+    calculatePagination(paginationOptions);
   const { status, paymentStatus, searchTerm, userId } = filters;
 
   const andConditions: Prisma.OrderWhereInput[] = [];
@@ -257,7 +274,11 @@ const getAllOrders = async (filters: IOrderFilters, paginationOptions: IPaginati
     andConditions.push({
       OR: [
         { orderNumber: { contains: searchTerm, mode: 'insensitive' } },
-        { shippingAddress: { is: { fullName: { contains: searchTerm, mode: 'insensitive' } } } },
+        {
+          shippingAddress: {
+            is: { fullName: { contains: searchTerm, mode: 'insensitive' } },
+          },
+        },
       ],
     });
   }
@@ -310,7 +331,10 @@ const getAllOrders = async (filters: IOrderFilters, paginationOptions: IPaginati
   };
 };
 
-const updateOrderStatus = async (orderId: string, payload: IUpdateOrderStatus) => {
+const updateOrderStatus = async (
+  orderId: string,
+  payload: IUpdateOrderStatus,
+) => {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
   });
@@ -334,7 +358,7 @@ const updateOrderStatus = async (orderId: string, payload: IUpdateOrderStatus) =
     updateData.paymentStatus = 'CANCELLED';
   } else if (payload.status === 'REFUNDED') {
     updateData.paymentStatus = 'CANCELLED';
-    
+
     // Restore stock for refunded orders
     const orderItems = await prisma.orderItem.findMany({
       where: { orderId },

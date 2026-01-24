@@ -1,9 +1,6 @@
 import express from 'express';
 import auth from '../../middlewares/auth';
-import { UserRoleEnum } from '@/generated/enums';
 import { notificationsControllers } from './notification.controller';
-import validateRequest from '../../middlewares/validateRequest';
-import { notificationValidation } from './notification.validation';
 
 export const NotificationsRouters = express.Router();
 

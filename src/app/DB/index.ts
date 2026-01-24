@@ -1,5 +1,5 @@
-import { UserRoleEnum } from '@/generated/enums';
 import * as bcrypt from 'bcrypt';
+import { UserRoleEnum } from 'prisma/src/generated/prisma/enums';
 import config from '../../config';
 import { prisma } from '../utils/prisma';
 
@@ -34,8 +34,8 @@ const seedSuperAdmin = async () => {
       });
       console.log('Super Admin created successfully.');
     } else {
+      console.log('Super Admin already exists.');
       return;
-      //   console.log("Super Admin already exists.");
     }
   } catch (error) {
     console.error('Error seeding Super Admin:', error);

@@ -2,17 +2,15 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  output     = "./../../src/generated"
-  provider   = "prisma-client"
-  engineType = "client"
-  runtime    = "bun"
+  provider = "prisma-client-js"
+  output   = "./../src/generated/prisma"
+  runtime  = "bun"
 }
 
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-
 
 enum ProductStatus {
   ACTIVE

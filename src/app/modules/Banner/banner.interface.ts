@@ -1,4 +1,4 @@
-import { BannerType } from '@/generated/enums';
+import { BannerType } from 'prisma/src/generated/prisma/enums';
 
 export interface IBanner {
   title: string;

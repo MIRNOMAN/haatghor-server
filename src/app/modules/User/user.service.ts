@@ -1,14 +1,13 @@
-import httpStatus from 'http-status';
-import {  UserRoleEnum, UserStatus } from '@/generated/enums';
-import QueryBuilder from '../../builder/QueryBuilder';
-import { prisma } from '../../utils/prisma';
-import { Request } from 'express';
-import AppError from '../../errors/AppError';
-import { JwtPayload } from 'jsonwebtoken';
-import { deleteFromCloudStorage, uploadToCloudStorage } from '../../utils/uploadToDigitalOceanAWS';
-import { uploadToMinIO } from '../../utils/uploadToMinio';
 import { User } from '@/generated/client';
-
+import { Request } from 'express';
+import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
+import { UserRoleEnum, UserStatus } from 'prisma/src/generated/prisma/enums';
+import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../errors/AppError';
+import { prisma } from '../../utils/prisma';
+import { deleteFromCloudStorage } from '../../utils/uploadToDigitalOceanAWS';
+import { uploadToMinIO } from '../../utils/uploadToMinio';
 
 interface UserWithOptionalPassword extends Omit<User, 'password'> {
   password?: string;
@@ -29,7 +28,12 @@ const getAllUsersFromDB = async (query: any, user: JwtPayload) => {
       email: true,
       role: true,
       profilePhoto: true,
-      ...(user.role === 'SUPERADMIN' && { isDeleted: true, createdAt: true, updatedAt: true, status: true, }),
+      ...(user.role === 'SUPERADMIN' && {
+        isDeleted: true,
+        createdAt: true,
+        updatedAt: true,
+        status: true,
+      }),
     })
     .exclude()
     .paginate()
@@ -57,19 +61,21 @@ const getMyProfileFromDB = async (id: string, role: UserRoleEnum) => {
             id: true,
             paymentStatus: true,
             endAt: true,
-            subscriptionPackageId: true
-          }
+            subscriptionPackageId: true,
+          },
         },
-      })
-    }
+      }),
+    },
   });
 
   if (role === 'SUPERADMIN') {
-    return { ...Profile, hideSubscription: false }
+    return { ...Profile, hideSubscription: false };
   }
 
-  const payments = Profile.payments
-  const exactPayment = payments?.filter(item => item.paymentStatus === 'SUCCESS')[0]
+  const payments = Profile.payments;
+  const exactPayment = payments?.filter(
+    item => item.paymentStatus === 'SUCCESS',
+  )[0];
   const isVerified = new Date(exactPayment?.endAt || '') >= new Date();
   const result = {
     ...Profile,
@@ -77,8 +83,8 @@ const getMyProfileFromDB = async (id: string, role: UserRoleEnum) => {
     isPaid: isVerified,
     subscriptionPackageId: exactPayment?.subscriptionPackageId || '',
     endAt: exactPayment?.endAt || null,
-    hideSubscription: false
-  }
+    hideSubscription: false,
+  };
   return result;
 };
 
@@ -86,7 +92,7 @@ const getUserDetailsFromDB = async (id: string, user: JwtPayload) => {
   const result = await prisma.user.findUniqueOrThrow({
     where: {
       id,
-      ...(user.role !== 'SUPERADMIN' && { isDeleted: false })
+      ...(user.role !== 'SUPERADMIN' && { isDeleted: false }),
     },
     select: {
       id: true,
@@ -95,31 +101,40 @@ const getUserDetailsFromDB = async (id: string, user: JwtPayload) => {
       email: true,
       role: true,
       profilePhoto: true,
-      ...(user.role === 'SUPERADMIN' && { isDeleted: true, createdAt: true, updatedAt: true, status: true, }),
+      ...(user.role === 'SUPERADMIN' && {
+        isDeleted: true,
+        createdAt: true,
+        updatedAt: true,
+        status: true,
+      }),
     },
   });
   return result;
 };
 
-const updateProfileImg = async (id: string, previousImg: string, req: Request, file: Express.Multer.File | undefined) => {
-
+const updateProfileImg = async (
+  id: string,
+  previousImg: string,
+  req: Request,
+  file: Express.Multer.File | undefined,
+) => {
   if (file) {
-    const location = await uploadToMinIO(file)
+    const location = await uploadToMinIO(file);
     const result = await prisma.user.update({
       where: {
-        id
+        id,
       },
       data: {
-        profilePhoto: location
-      }
+        profilePhoto: location,
+      },
     });
     if (previousImg) {
-      deleteFromCloudStorage(previousImg)
+      deleteFromCloudStorage(previousImg);
     }
     req.user.profilePhoto = location;
-    return result
+    return result;
   }
-  throw new AppError(httpStatus.NOT_FOUND, 'Please provide image')
+  throw new AppError(httpStatus.NOT_FOUND, 'Please provide image');
 };
 
 const updateMyProfileIntoDB = async (
@@ -127,16 +142,15 @@ const updateMyProfileIntoDB = async (
 
   payload: Partial<User>,
 ) => {
-  delete payload.email
-
+  delete payload.email;
 
   const result = await prisma.user.update({
     where: {
-      id
+      id,
     },
-    data: payload
-  })
-  return result
+    data: payload,
+  });
+  return result;
 };
 
 const updateUserRoleStatusIntoDB = async (id: string, role: UserRoleEnum) => {
@@ -145,7 +159,7 @@ const updateUserRoleStatusIntoDB = async (id: string, role: UserRoleEnum) => {
       id: id,
     },
     data: {
-      role: role
+      role: role,
     },
   });
   return result;
@@ -153,24 +167,24 @@ const updateUserRoleStatusIntoDB = async (id: string, role: UserRoleEnum) => {
 const updateProfileStatus = async (id: string, status: UserStatus) => {
   const result = await prisma.user.update({
     where: {
-      id
+      id,
     },
     data: {
-      status
+      status,
     },
     select: {
       id: true,
       status: true,
-      role: true
+      role: true,
     },
-  })
-  return result
-}
+  });
+  return result;
+};
 
 const deleteMyProfileFromDB = async (id: string) => {
   await prisma.user.update({
     where: {
-      id
+      id,
     },
     data: {
       isDeleted: true,
@@ -182,20 +196,20 @@ const deleteMyProfileFromDB = async (id: string) => {
       otpExpiry: null,
       passwordResetToken: null,
       passwordResetTokenExpires: null,
-    }
+    },
   });
-  return { message: 'Account deleted successfully' }
-}
+  return { message: 'Account deleted successfully' };
+};
 
 const undeletedUser = async (id: string) => {
   const result = await prisma.user.update({
     where: { id },
     data: {
       isDeleted: false,
-    }
+    },
   });
   return result;
-}
+};
 
 export const UserServices = {
   getAllUsersFromDB,
@@ -206,5 +220,5 @@ export const UserServices = {
   updateProfileStatus,
   updateProfileImg,
   deleteMyProfileFromDB,
-  undeletedUser
+  undeletedUser,
 };

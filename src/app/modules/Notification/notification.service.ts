@@ -1,14 +1,14 @@
-import { NotificationType, NotificationUser, User } from '@/generated/enums';
+import { NotificationType } from 'prisma/src/generated/prisma/enums';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { getSocket } from '../../utils/socket';
 import { prisma } from '../../utils/prisma';
+import { getSocket } from '../../utils/socket';
 
 const createNotification = async (payload: {
   title: string;
   message: string;
   type: NotificationType;
   userIds: string[];
-  redirectEndpoint?: string
+  redirectEndpoint?: string;
 }) => {
   const { title, message, type, userIds, redirectEndpoint } = payload;
 
@@ -20,7 +20,7 @@ const createNotification = async (payload: {
       title,
       message,
       type,
-      redirectEndpoint: redirectEndpoint || ''
+      redirectEndpoint: redirectEndpoint || '',
     },
   });
 
@@ -57,10 +57,7 @@ const getAllNotificationsByUser = async (
   query: Record<string, unknown>,
 ) => {
   query.userId = id;
-  const notificationQuery = new QueryBuilder(
-    prisma.notificationUser,
-    query,
-  );
+  const notificationQuery = new QueryBuilder(prisma.notificationUser, query);
   const result = await notificationQuery
     .search(['name'])
     .filter()
@@ -79,8 +76,8 @@ const getAllNotificationsByUser = async (
           createdAt: true,
           title: true,
           type: true,
-          redirectEndpoint: true
-        }
+          redirectEndpoint: true,
+        },
       },
       receivedAt: true,
       updatedAt: true,
@@ -90,12 +87,12 @@ const getAllNotificationsByUser = async (
           firstName: true,
           lastName: true,
           email: true,
-          role: true
-        }
-      }
+          role: true,
+        },
+      },
     })
     .execute();
-  return result
+  return result;
 };
 
 const getUsersByNotification = async (notificationId: string) => {
@@ -107,7 +104,6 @@ const getUsersByNotification = async (notificationId: string) => {
       user: true,
     },
   });
-
 
   return users.map(recipient => recipient.user);
 };

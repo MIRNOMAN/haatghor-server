@@ -1,12 +1,11 @@
-import { BillingCycle } from "@/generated/enums";
+import { BillingCycle } from 'prisma/src/generated/prisma/enums';
 
 export interface CreateSubscriptionPayload {
-    name: string;
-    price: number;
-    currency: string;
-    billingCycle: BillingCycle;
-    points: string[];
-    active?: boolean;
-    isVisible?: boolean;
-   
+  name: string;
+  price: number;
+  currency: string;
+  billingCycle: BillingCycle;
+  points: string[];
+  active?: boolean;
+  isVisible?: boolean;
 }

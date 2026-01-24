@@ -1,14 +1,17 @@
 import httpStatus from 'http-status';
+import { Prisma } from 'prisma/src/generated/prisma/enums';
 import AppError from '../../errors/AppError';
-import { prisma } from '../../utils/prisma';
-import { IProduct, IProductFilters } from './product.interface';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
-import { Prisma } from '@/generated/enums';
+import { prisma } from '../../utils/prisma';
+import { IProduct, IProductFilters } from './product.interface';
 
 const createProduct = async (payload: IProduct) => {
   // Generate slug from name
-  const slug = payload.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  const slug = payload.name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '');
 
   // Check if category exists
   const category = await prisma.category.findUnique({
@@ -25,7 +28,10 @@ const createProduct = async (payload: IProduct) => {
   });
 
   if (existingProduct) {
-    throw new AppError(httpStatus.CONFLICT, 'Product with similar name already exists');
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'Product with similar name already exists',
+    );
   }
 
   const result = await prisma.product.create({
@@ -47,8 +53,19 @@ const getAllProducts = async (
   filters: IProductFilters,
   paginationOptions: IPaginationOptions,
 ) => {
-  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
-  const { searchTerm, category, brand, minPrice, maxPrice, rating, status, isFeatured, tags } = filters;
+  const { page, limit, skip, sortBy, sortOrder } =
+    calculatePagination(paginationOptions);
+  const {
+    searchTerm,
+    category,
+    brand,
+    minPrice,
+    maxPrice,
+    rating,
+    status,
+    isFeatured,
+    tags,
+  } = filters;
 
   const andConditions: Prisma.ProductWhereInput[] = [];
 
@@ -106,7 +123,7 @@ const getAllProducts = async (
 
   // Determine sort field
   let orderBy: any = { [sortBy]: sortOrder };
-  
+
   // Handle custom sort options
   if (sortBy === 'price_asc') {
     orderBy = { price: 'asc' };
@@ -226,7 +243,10 @@ const updateProduct = async (id: string, payload: Partial<IProduct>) => {
 
   // Generate new slug if name is updated
   if (payload.name) {
-    const slug = payload.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+    const slug = payload.name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '');
     payload.slug = slug;
   }
 
