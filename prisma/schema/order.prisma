@@ -13,6 +13,13 @@ model Order {
   shippingAddress ShippingAddress
   trackingNumber  String?
   notes           String?
+  
+  // SSLCommerz payment fields
+  sslCommerzTranId     String?
+  sslCommerzValId      String?
+  sslCommerzBankTranId String?
+  sslCommerzCardType   String?
+  
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -62,6 +69,7 @@ enum OrderStatus {
 enum PaymentMethod {
   BKASH
   NAGAD
+  SSLCOMMERZ
   CASH_ON_DELIVERY
   STRIPE
 }

@@ -4,6 +4,12 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
 import { prisma } from '../../utils/prisma';
 import { subscriptionCheckout } from '../../utils/StripeUtils';
+import {
+  initSSLCommerzPayment,
+  validateSSLCommerzPayment,
+  generateTransactionId,
+} from '../../utils/sslcommerzPayment';
+import config from '../../../config';
 
 const handleBuySubscription = async (
   id: string,
@@ -333,6 +339,185 @@ const cancelPayment = async (
   });
 };
 
+/**
+ * Initialize SSLCommerz payment for order
+ */
+const initOrderPayment = async (
+  orderId: string,
+  userId: string,
+  userEmail: string,
+  userName: string,
+  userPhone: string,
+) => {
+  // Get order details
+  const order = await prisma.order.findUnique({
+    where: { id: orderId, userId },
+    include: {
+      items: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  });
+
+  if (!order) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+  }
+
+  if (order.paymentStatus === 'SUCCESS') {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Order already paid');
+  }
+
+  // Generate transaction ID
+  const tranId = generateTransactionId();
+
+  // Prepare payment data
+  const paymentData = {
+    total_amount: order.finalAmount,
+    currency: 'BDT',
+    tran_id: tranId,
+    success_url: config.sslcommerz.success_url || `${config.base_url_client}/payment/success`,
+    fail_url: config.sslcommerz.fail_url || `${config.base_url_client}/payment/fail`,
+    cancel_url: config.sslcommerz.cancel_url || `${config.base_url_client}/payment/cancel`,
+    ipn_url: config.sslcommerz.ipn_url,
+    cus_name: userName,
+    cus_email: userEmail,
+    cus_phone: userPhone,
+    cus_add1: order.shippingAddress?.address || 'N/A',
+    cus_city: order.shippingAddress?.city || 'Dhaka',
+    cus_country: 'Bangladesh',
+    product_name: `Order ${order.orderNumber}`,
+    product_category: 'E-commerce',
+    product_profile: 'general',
+    value_a: orderId, // Store order ID for later reference
+    value_b: userId,
+  };
+
+  // Initialize payment
+  const result = await initSSLCommerzPayment(paymentData);
+
+  if (!result.success) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      result.error || 'Failed to initialize payment',
+    );
+  }
+
+  // Update order with transaction ID
+  await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      sslCommerzTranId: tranId,
+    },
+  });
+
+  return {
+    GatewayPageURL: result.GatewayPageURL,
+    tranId,
+  };
+};
+
+/**
+ * Validate SSLCommerz payment success
+ */
+const validatePaymentSuccess = async (val_id: string, tran_id: string) => {
+  // Validate with SSLCommerz
+  const validation = await validateSSLCommerzPayment(val_id);
+
+  if (!validation.success || !validation.data) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Payment validation failed',
+    );
+  }
+
+  // Get order by transaction ID
+  const order = await prisma.order.findFirst({
+    where: { sslCommerzTranId: tran_id },
+  });
+
+  if (!order) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+  }
+
+  // Update order payment status
+  await prisma.order.update({
+    where: { id: order.id },
+    data: {
+      paymentStatus: 'SUCCESS',
+      status: 'PROCESSING',
+      sslCommerzValId: val_id,
+      sslCommerzBankTranId: validation.data.bank_tran_id,
+      sslCommerzCardType: validation.data.card_type,
+    },
+  });
+
+  return {
+    success: true,
+    order,
+  };
+};
+
+/**
+ * Handle SSLCommerz payment failure
+ */
+const handlePaymentFailure = async (tran_id: string) => {
+  const order = await prisma.order.findFirst({
+    where: { sslCommerzTranId: tran_id },
+  });
+
+  if (order) {
+    await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        paymentStatus: 'FAILED',
+        status: 'CANCELLED',
+      },
+    });
+  }
+
+  return { success: true };
+};
+
+/**
+ * Handle SSLCommerz payment cancellation
+ */
+const handlePaymentCancellation = async (tran_id: string) => {
+  const order = await prisma.order.findFirst({
+    where: { sslCommerzTranId: tran_id },
+  });
+
+  if (order) {
+    await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        paymentStatus: 'CANCELLED',
+        status: 'CANCELLED',
+      },
+    });
+  }
+
+  return { success: true };
+};
+
+/**
+ * Handle SSLCommerz IPN (Instant Payment Notification)
+ */
+const handleSSLCommerzIPN = async (ipnData: any) => {
+  const { val_id, tran_id, status } = ipnData;
+
+  if (status === 'VALID' || status === 'VALIDATED') {
+    await validatePaymentSuccess(val_id, tran_id);
+  } else if (status === 'FAILED') {
+    await handlePaymentFailure(tran_id);
+  } else if (status === 'CANCELLED') {
+    await handlePaymentCancellation(tran_id);
+  }
+
+  return { success: true };
+};
+
 export const PaymentService = {
   getAllPayments,
   singleTransactionHistory,
@@ -341,4 +526,9 @@ export const PaymentService = {
   handleBuySubscription,
   handleRenewSubscription,
   getUserActiveSubscriptions,
+  initOrderPayment,
+  validatePaymentSuccess,
+  handlePaymentFailure,
+  handlePaymentCancellation,
+  handleSSLCommerzIPN,
 };

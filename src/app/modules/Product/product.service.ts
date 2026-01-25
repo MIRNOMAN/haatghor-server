@@ -4,50 +4,66 @@ import AppError from '../../errors/AppError';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
 import { prisma } from '../../utils/prisma';
-import { IProduct, IProductFilters } from './product.interface';
+import { IProduct, IProductFilters, Variant } from './product.interface';
 
-const createProduct = async (payload: IProduct) => {
-  // Generate slug from name
-  const slug = payload.name
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '');
+export const createProduct = async (payload: IProduct) => {
+  // 1️⃣ Generate slug from name if not provided
+  const slug =
+    payload.slug ||
+    payload.name
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '');
 
-  // Check if category exists
+  // 2️⃣ Check category exists
   const category = await prisma.category.findUnique({
     where: { id: payload.categoryId },
   });
+  if (!category) throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
 
-  if (!category) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Category not found');
+  // 3️⃣ Check if product with same slug exists
+  const existingProduct = await prisma.product.findUnique({ where: { slug } });
+  if (existingProduct)
+    throw new AppError(httpStatus.CONFLICT, 'Product with similar name exists');
+
+  // 4️⃣ Transform variants to match Prisma type
+  const variants: Variant[] = [];
+  if (payload.variants?.length) {
+    payload.variants.forEach((v) => {
+      if (v.options?.length) {
+        v.options.forEach((opt) => {
+          variants.push({ name: v.name, value: opt, price: v.price, stock: v.stock });
+        });
+      } else if (v.value) {
+        variants.push({ name: v.name, value: v.value, price: v.price, stock: v.stock });
+      }
+    });
   }
 
-  // Check if product with same slug exists
-  const existingProduct = await prisma.product.findUnique({
-    where: { slug },
-  });
-
-  if (existingProduct) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      'Product with similar name already exists',
-    );
-  }
-
-  const result = await prisma.product.create({
+  // 5️⃣ Create product
+  const product = await prisma.product.create({
     data: {
-      ...payload,
+      name: payload.name,
       slug,
-      variants: payload.variants || [],
+      description: payload.description || '',
+      categoryId: payload.categoryId,
+      brand: payload.brand || null,
+      images: payload.images || [],
+      price: payload.price,
+      discount: payload.discount || 0,
+      stock: payload.stock || 0,
+      status: payload.status || 'ACTIVE',
+      specifications: payload.specifications || {},
+      variants,
       tags: payload.tags || [],
     },
-    include: {
-      category: true,
-    },
+    include: { category: true }, // Include category relation if needed
   });
 
-  return result;
+  return product;
 };
+
 
 const getAllProducts = async (
   filters: IProductFilters,

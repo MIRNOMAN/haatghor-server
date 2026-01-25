@@ -35,6 +35,11 @@ router.get('/session/:sessionId', auth('ANY'), PaymentController.singleTransacti
 
 router.patch('/:id/cancel', auth('ANY'), PaymentController.cancelPayment);
 
-
+// SSLCommerz payment routes
+router.post('/sslcommerz/init', auth('ANY'), PaymentController.initOrderPayment);
+router.post('/sslcommerz/success', PaymentController.sslCommerzSuccess);
+router.post('/sslcommerz/fail', PaymentController.sslCommerzFail);
+router.post('/sslcommerz/cancel', PaymentController.sslCommerzCancel);
+router.post('/sslcommerz/ipn', PaymentController.sslCommerzIPN);
 
 export const PaymentRoutes = router;

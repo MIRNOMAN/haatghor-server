@@ -109,6 +109,70 @@ const cancelPayment = catchAsync(async (req, res) => {
   });
 });
 
+// Initialize SSLCommerz payment for order
+const initOrderPayment = catchAsync(async (req, res) => {
+  const { orderId } = req.body;
+  const userId = req.user.id;
+  const userEmail = req.user.email;
+  const userName = `${req.user.firstName} ${req.user.lastName}`;
+  const userPhone = req.user.phoneNumber || 'N/A';
+
+  const result = await PaymentService.initOrderPayment(
+    orderId,
+    userId,
+    userEmail,
+    userName,
+    userPhone,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Payment initialized successfully',
+    data: result,
+  });
+});
+
+// SSLCommerz payment success callback
+const sslCommerzSuccess = catchAsync(async (req, res) => {
+  const { val_id, tran_id } = req.body;
+
+  const result = await PaymentService.validatePaymentSuccess(val_id, tran_id);
+
+  // Redirect to success page
+  res.redirect(`${process.env.BASE_URL_CLIENT}/payment/success?order=${result.order.orderNumber}`);
+});
+
+// SSLCommerz payment failure callback
+const sslCommerzFail = catchAsync(async (req, res) => {
+  const { tran_id } = req.body;
+
+  await PaymentService.handlePaymentFailure(tran_id);
+
+  // Redirect to failure page
+  res.redirect(`${process.env.BASE_URL_CLIENT}/payment/fail`);
+});
+
+// SSLCommerz payment cancellation callback
+const sslCommerzCancel = catchAsync(async (req, res) => {
+  const { tran_id } = req.body;
+
+  await PaymentService.handlePaymentCancellation(tran_id);
+
+  // Redirect to cancellation page
+  res.redirect(`${process.env.BASE_URL_CLIENT}/payment/cancel`);
+});
+
+// SSLCommerz IPN handler
+const sslCommerzIPN = catchAsync(async (req, res) => {
+  await PaymentService.handleSSLCommerzIPN(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'IPN processed successfully',
+    data: null,
+  });
+});
+
 export const PaymentController = {
   handleBuySubscription,
   handleRenewSubscription,
@@ -117,4 +181,9 @@ export const PaymentController = {
   singleTransactionHistory,
   singleTransactionHistoryBySessionId,
   cancelPayment,
+  initOrderPayment,
+  sslCommerzSuccess,
+  sslCommerzFail,
+  sslCommerzCancel,
+  sslCommerzIPN,
 };

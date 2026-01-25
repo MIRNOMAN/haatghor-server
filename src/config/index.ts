@@ -57,4 +57,18 @@ export default {
     public_key: process.env.NAGAD_PUBLIC_KEY,
     private_key: process.env.NAGAD_PRIVATE_KEY,
   },
+  sslcommerz: {
+    store_id: process.env.SSLCOMMERZ_STORE_ID,
+    store_password: process.env.SSLCOMMERZ_STORE_PASSWORD,
+    is_live: process.env.SSLCOMMERZ_IS_LIVE === 'true',
+    success_url: process.env.SSLCOMMERZ_SUCCESS_URL,
+    fail_url: process.env.SSLCOMMERZ_FAIL_URL,
+    cancel_url: process.env.SSLCOMMERZ_CANCEL_URL,
+    ipn_url: process.env.SSLCOMMERZ_IPN_URL,
+  },
+  image: {
+    upload_type: process.env.IMAGE_UPLOAD_TYPE || 'vps',
+    max_size: parseInt(process.env.IMAGE_MAX_SIZE || '10'),
+    allowed_types: process.env.IMAGE_ALLOWED_TYPES?.split(',') || ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+  },
 };

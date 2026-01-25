@@ -1,6 +1,6 @@
 import { ProductStatus } from '@prisma/client';
 
-export interface IVariant {
+export interface Variant {
   name: string;
   value: string;
   price?: number;
@@ -8,19 +8,18 @@ export interface IVariant {
 }
 
 export interface IProduct {
-  id?: string;
   name: string;
   slug?: string;
-  description: string;
+  description?: string;
   categoryId: string;
   brand?: string;
-  images: string[];
+  images?: string[];
   price: number;
   discount?: number;
-  stock: number;
-  status?: ProductStatus;
-  variants?: IVariant[];
-  isFeatured?: boolean;
+  stock?: number;
+  status?: 'ACTIVE' | 'INACTIVE';
+  specifications?: Record<string, any>;
+  variants?: { name: string; options?: string[]; value?: string; price?: number; stock?: number }[];
   tags?: string[];
 }
 

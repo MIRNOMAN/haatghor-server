@@ -270,26 +270,38 @@ const deleteImage = async (id: string) => {
 /**
  * Delete multiple images
  */
-const deleteMultipleImages = async (ids: string[]) => {
-  if (!ids || ids.length === 0) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'No image IDs provided');
+const deleteMultipleImages = async (ids?: string[], urls?: string[]) => {
+  if ((!ids || ids.length === 0) && (!urls || urls.length === 0)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'No image IDs or URLs provided');
   }
 
+  // Build query
+  const whereClause: any = {};
+  if (ids && ids.length > 0) whereClause.id = { in: ids };
+  if (urls && urls.length > 0) whereClause.url = { in: urls };
+
+  // Find images from DB
   const images = await prisma.image.findMany({
-    where: { id: { in: ids } },
+    where: whereClause,
   });
 
-  // Delete files from filesystem
+  if (!images || images.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No images found for the given IDs/URLs');
+  }
+
+  // Delete files from VPS or filesystem
   const deletePromises = images.map(image => deleteFileFromVPS(image.filename));
   await Promise.all(deletePromises);
 
   // Delete from database
   const result = await prisma.image.deleteMany({
-    where: { id: { in: ids } },
+    where: whereClause,
   });
 
   return result;
 };
+
+
 
 export const ImageService = {
   uploadSingleImage,
