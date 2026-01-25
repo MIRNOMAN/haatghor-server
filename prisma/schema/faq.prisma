@@ -1,0 +1,12 @@
+model FAQ {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  question  String
+  answer    String
+  category  String?  // Optional: General, Shipping, Payment, Returns, etc.
+  order     Int      @default(0) // For custom ordering
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("faqs")
+}

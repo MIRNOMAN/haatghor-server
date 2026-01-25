@@ -1,0 +1,815 @@
+{
+  "info": {
+    "name": "HaatGhor - New Modules (Image, FAQ, Privacy, Contact)",
+    "description": "API collection for Image Upload, FAQ, Privacy Policy, and Contact Us modules",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Image Module",
+      "item": [
+        {
+          "name": "Upload Single Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "category",
+                  "value": "product",
+                  "type": "text"
+                },
+                {
+                  "key": "alt",
+                  "value": "Product image",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Main product photo",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/images/upload/single",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "upload", "single"]
+            }
+          }
+        },
+        {
+          "name": "Upload Multiple Images",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "category",
+                  "value": "gallery",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Product gallery images",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/images/upload/multiple",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "upload", "multiple"]
+            }
+          }
+        },
+        {
+          "name": "Get All Images",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images?page=1&limit=10&category=product",
+              "host": ["{{baseUrl}}"],
+              "path": ["images"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "category",
+                  "value": "product"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Image by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Image Metadata",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"updated-category\",\n  \"alt\": \"Updated alt text\",\n  \"description\": \"Updated description\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/images/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Replace Image File",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "alt",
+                  "value": "Replaced image",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/images/:id/replace",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", ":id", "replace"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Single Image",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/images/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Multiple Images",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\"id1\", \"id2\", \"id3\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/images/delete/multiple",
+              "host": ["{{baseUrl}}"],
+              "path": ["images", "delete", "multiple"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "FAQ Module",
+      "item": [
+        {
+          "name": "Create FAQ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What is your return policy?\",\n  \"answer\": \"You can return any item within 30 days of purchase with original receipt and packaging.\",\n  \"category\": \"Returns\",\n  \"order\": 1,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/faqs",
+              "host": ["{{baseUrl}}"],
+              "path": ["faqs"]
+            }
+          }
+        },
+        {
+          "name": "Get All FAQs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/faqs?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["faqs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "category",
+                  "value": "Shipping",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get FAQ by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/faqs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["faqs", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update FAQ",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Updated question?\",\n  \"answer\": \"Updated answer content.\",\n  \"order\": 2,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/faqs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["faqs", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete FAQ",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/faqs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["faqs", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Privacy Policy Module",
+      "item": [
+        {
+          "name": "Create Privacy Policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Data Collection\",\n  \"content\": \"We collect the following information when you use our services...\",\n  \"section\": \"Information Collection\",\n  \"order\": 1,\n  \"version\": \"2.0\",\n  \"isActive\": true,\n  \"effectiveDate\": \"2026-01-25T00:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/privacy-policy",
+              "host": ["{{baseUrl}}"],
+              "path": ["privacy-policy"]
+            }
+          }
+        },
+        {
+          "name": "Get All Privacy Policies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/privacy-policy?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["privacy-policy"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "section",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "version",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Active Privacy Policies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/privacy-policy/active",
+              "host": ["{{baseUrl}}"],
+              "path": ["privacy-policy", "active"]
+            }
+          }
+        },
+        {
+          "name": "Get Privacy Policy by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/privacy-policy/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["privacy-policy", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Privacy Policy",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Data Collection\",\n  \"content\": \"Updated content...\",\n  \"version\": \"2.1\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/privacy-policy/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["privacy-policy", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Privacy Policy",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/privacy-policy/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["privacy-policy", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contact Us Module",
+      "item": [
+        {
+          "name": "Submit Contact Form",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+1234567890\",\n  \"subject\": \"Product inquiry\",\n  \"message\": \"I have a question about your product. Can you provide more details?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact"]
+            }
+          }
+        },
+        {
+          "name": "Get All Contact Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contact?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "PENDING",
+                  "disabled": true
+                },
+                {
+                  "key": "isRead",
+                  "value": "false",
+                  "disabled": true
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Contact Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contact/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact", "statistics"]
+            }
+          }
+        },
+        {
+          "name": "Get Contact by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contact/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contact/:id/mark-read",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact", ":id", "mark-read"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Respond to Contact",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"response\": \"Thank you for your inquiry. Here is the information you requested...\",\n  \"status\": \"RESOLVED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contact/:id/respond",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact", ":id", "respond"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Contact",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"isRead\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contact/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Contact",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contact/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

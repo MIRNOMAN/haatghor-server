@@ -1,0 +1,17 @@
+model Image {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  filename    String
+  originalName String
+  path        String
+  url         String
+  mimetype    String
+  size        Int
+  category    String?  // Optional: to categorize images (product, banner, profile, etc.)
+  alt         String?  // Alt text for accessibility
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("images")
+}

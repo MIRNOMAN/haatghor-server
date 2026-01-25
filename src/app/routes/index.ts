@@ -15,6 +15,10 @@ import { WishlistRoutes } from '../modules/Wishlist/wishlist.route';
 import { AddressRoutes } from '../modules/Address/address.route';
 import { BannerRoutes } from '../modules/Banner/banner.route';
 import { AdminRoutes } from '../modules/Admin/admin.route';
+import { ImageRoutes } from '../modules/Image/image.route';
+import { FAQRoutes } from '../modules/FAQ/faq.route';
+import { PrivacyPolicyRoutes } from '../modules/PrivacyPolicy/privacyPolicy.route';
+import { ContactUsRoutes } from '../modules/ContactUs/contactUs.route';
 
 const router = express.Router();
 
@@ -87,6 +91,23 @@ const moduleRoutes = [
   {
     path: '/admin',
     route: AdminRoutes,
+  },
+  // Static Content & Media Routes
+  {
+    path: '/images',
+    route: ImageRoutes,
+  },
+  {
+    path: '/faqs',
+    route: FAQRoutes,
+  },
+  {
+    path: '/privacy-policy',
+    route: PrivacyPolicyRoutes,
+  },
+  {
+    path: '/contact',
+    route: ContactUsRoutes,
   },
 ];
 
