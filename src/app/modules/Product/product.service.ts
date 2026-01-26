@@ -138,17 +138,22 @@ const getAllProducts = async (
     andConditions.length > 0 ? { AND: andConditions } : {};
 
   // Determine sort field
-  let orderBy: any = { [sortBy]: sortOrder };
+  let orderBy: any = { createdAt: 'desc' };
 
   // Handle custom sort options
-  if (sortBy === 'price_asc') {
-    orderBy = { price: 'asc' };
-  } else if (sortBy === 'price_desc') {
-    orderBy = { price: 'desc' };
-  } else if (sortBy === 'newest') {
-    orderBy = { createdAt: 'desc' };
-  } else if (sortBy === 'top_rated') {
-    orderBy = { rating: 'desc' };
+  switch (sortBy) {
+    case 'price_asc':
+      orderBy = { price: 'asc' };
+      break;
+    case 'price_desc':
+      orderBy = { price: 'desc' };
+      break;
+    case 'newest':
+      orderBy = { createdAt: 'desc' };
+      break;
+    case 'top_rated':
+      orderBy = { rating: 'desc' };
+      break;
   }
 
   const result = await prisma.product.findMany({
