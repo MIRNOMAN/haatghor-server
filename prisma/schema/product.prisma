@@ -24,6 +24,7 @@ model Product {
   cartItems  CartItem[]
   orderItems OrderItem[]
   wishlist   Wishlist[]
+  flashSales FlashSale[]
 
   @@map("products")
 }

@@ -349,19 +349,25 @@ const initOrderPayment = async (
   userName: string,
   userPhone: string,
 ) => {
+  // Debug logs
+  console.log('Initiating payment for:', { orderId, userId, userEmail });
+  
   // Get order details
-  const order = await prisma.order.findUnique({
-    where: { id: orderId, userId },
+  const order = await prisma.order.findFirst({
+    where: {
+      id: orderId,
+      userId,
+    },
     include: {
       items: {
-        include: {
-          product: true,
-        },
+        include: { product: true },
       },
     },
   });
-
+  
+  console.log('Order found:', order ? 'Yes' : 'No');
   if (!order) {
+    console.log('Order not found with orderId:', orderId, 'and userId:', userId);
     throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
   }
 
@@ -377,22 +383,34 @@ const initOrderPayment = async (
     total_amount: order.finalAmount,
     currency: 'BDT',
     tran_id: tranId,
-    success_url: config.sslcommerz.success_url || `${config.base_url_client}/payment/success`,
-    fail_url: config.sslcommerz.fail_url || `${config.base_url_client}/payment/fail`,
-    cancel_url: config.sslcommerz.cancel_url || `${config.base_url_client}/payment/cancel`,
+    success_url: config.sslcommerz.success_url || `${config.base_url_client}/en/payment/success`,
+    fail_url: config.sslcommerz.fail_url || `${config.base_url_client}/en/payment/failed`,
+    cancel_url: config.sslcommerz.cancel_url || `${config.base_url_client}/en/payment/cancelled`,
     ipn_url: config.sslcommerz.ipn_url,
     cus_name: userName,
     cus_email: userEmail,
     cus_phone: userPhone,
     cus_add1: order.shippingAddress?.address || 'N/A',
     cus_city: order.shippingAddress?.city || 'Dhaka',
-    cus_country: 'Bangladesh',
+    cus_country: order.shippingAddress?.country || 'Bangladesh',
     product_name: `Order ${order.orderNumber}`,
     product_category: 'E-commerce',
     product_profile: 'general',
+  
+    // Shipping info (optional but recommended)
+    shipping_method: order.shippingAddress ? 'YES' : 'NO',
+    ship_name: order.shippingAddress?.fullName || userName, // ✅ Fixed: use fullName not name
+    ship_add1: order.shippingAddress?.address,
+    ship_city: order.shippingAddress?.city,
+    ship_country: order.shippingAddress?.country || 'Bangladesh',
+    ship_postcode: order.shippingAddress?.zipCode || '0000',
+    ship_state: order.shippingAddress?.state || 'Dhaka',
+  
     value_a: orderId, // Store order ID for later reference
     value_b: userId,
   };
+  
+  
 
   // Initialize payment
   const result = await initSSLCommerzPayment(paymentData);
@@ -413,8 +431,10 @@ const initOrderPayment = async (
   });
 
   return {
+    paymentUrl: result.GatewayPageURL,  // Changed key name for frontend consistency
     GatewayPageURL: result.GatewayPageURL,
     tranId,
+    orderId,
   };
 };
 
@@ -422,40 +442,102 @@ const initOrderPayment = async (
  * Validate SSLCommerz payment success
  */
 const validatePaymentSuccess = async (val_id: string, tran_id: string) => {
-  // Validate with SSLCommerz
-  const validation = await validateSSLCommerzPayment(val_id);
+  console.log('\n🔍 ='.repeat(40));
+  console.log('=== Validating Payment Success ===');
+  console.log('Validation ID:', val_id);
+  console.log('Transaction ID:', tran_id);
 
-  if (!validation.success || !validation.data) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'Payment validation failed',
-    );
-  }
-
-  // Get order by transaction ID
+  // Get order by transaction ID FIRST
   const order = await prisma.order.findFirst({
     where: { sslCommerzTranId: tran_id },
   });
 
   if (!order) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+    console.error('❌ Order not found with transaction ID:', tran_id);
+    
+    // List recent orders for debugging
+    const recentOrders = await prisma.order.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        orderNumber: true,
+        sslCommerzTranId: true,
+        paymentStatus: true,
+      },
+    });
+    console.log('📋 Recent orders with transaction IDs:', recentOrders);
+    
+    throw new AppError(httpStatus.NOT_FOUND, 'Order not found for this transaction');
+  }
+
+  console.log('✅ Order found:', {
+    orderNumber: order.orderNumber,
+    currentStatus: order.status,
+    currentPaymentStatus: order.paymentStatus,
+  });
+
+  // Check if already processed
+  if (order.paymentStatus === 'SUCCESS') {
+    console.log('⚠️ Payment already processed for order:', order.orderNumber);
+    return {
+      success: true,
+      order,
+    };
+  }
+
+  // Validate with SSLCommerz (skip in sandbox for testing)
+  const isSandbox = config.sslcommerz.is_live === false;
+  let validatedData: any = null;
+
+  if (isSandbox) {
+    console.log('⚠️ SANDBOX MODE: Skipping SSLCommerz validation');
+    console.log('💡 In production, validation is mandatory!');
+    validatedData = {
+      bank_tran_id: 'SANDBOX_' + Date.now(),
+      card_type: 'SANDBOX_CARD',
+    };
+  } else {
+    console.log('🔄 Validating with SSLCommerz API...');
+    const validation = await validateSSLCommerzPayment(val_id);
+    console.log('SSLCommerz Validation Result:', validation);
+
+    if (!validation.success || !validation.data) {
+      console.error('❌ SSLCommerz validation failed:', validation.error);
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        validation.error || 'Payment validation failed',
+      );
+    }
+    validatedData = validation.data;
   }
 
   // Update order payment status
-  await prisma.order.update({
+  console.log('💾 Updating order in database...');
+  const updatedOrder = await prisma.order.update({
     where: { id: order.id },
     data: {
       paymentStatus: 'SUCCESS',
       status: 'PROCESSING',
       sslCommerzValId: val_id,
-      sslCommerzBankTranId: validation.data.bank_tran_id,
-      sslCommerzCardType: validation.data.card_type,
+      sslCommerzBankTranId: validatedData.bank_tran_id,
+      sslCommerzCardType: validatedData.card_type,
     },
   });
 
+  console.log('✅ ✅ ✅ Order updated successfully ✅ ✅ ✅');
+  console.log('📦 Order Details:', {
+    orderNumber: updatedOrder.orderNumber,
+    paymentStatus: updatedOrder.paymentStatus,
+    status: updatedOrder.status,
+    sslCommerzValId: updatedOrder.sslCommerzValId,
+  });
+  console.log('='.repeat(80));
+  console.log('\n');
+
   return {
     success: true,
-    order,
+    order: updatedOrder,
   };
 };
 

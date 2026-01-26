@@ -19,6 +19,7 @@ app.use(
   cors({
     origin: [
       'http://localhost:3001',
+      'http://localhost:3002',
       'http://localhost:3000',
       'http://172.252.13.78:3014',
       'https://bretervin.tamshyah.com',

@@ -189,7 +189,12 @@ const getAllProducts = async (
   };
 };
 
-const getProductById = async (id: string) => {
+export const getProductById = async (id: string) => {
+  // Validate ObjectID manually (24 hex characters)
+  if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product ID');
+  }
+
   const result = await prisma.product.findUnique({
     where: { id },
     include: {
@@ -199,25 +204,15 @@ const getProductById = async (id: string) => {
         orderBy: { createdAt: 'desc' },
         include: {
           user: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              profilePhoto: true,
-            },
+            select: { id: true, firstName: true, lastName: true, profilePhoto: true },
           },
         },
       },
-      _count: {
-        select: { reviews: true },
-      },
+      _count: { select: { reviews: true } },
     },
   });
 
-  if (!result) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
-  }
-
+  if (!result) throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   return result;
 };
 

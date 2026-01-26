@@ -134,43 +134,101 @@ const initOrderPayment = catchAsync(async (req, res) => {
 
 // SSLCommerz payment success callback
 const sslCommerzSuccess = catchAsync(async (req, res) => {
-  const { val_id, tran_id } = req.body;
+  console.log('\n\n🎉 ='.repeat(40));
+  console.log('=== SSLCommerz Success Callback RECEIVED ===');
+  console.log('Timestamp:', new Date().toISOString());
+  console.log('Request Method:', req.method);
+  console.log('Request URL:', req.url);
+  console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
+  console.log('Request Body:', JSON.stringify(req.body, null, 2));
+  console.log('Request Query:', JSON.stringify(req.query, null, 2));
+  console.log('='.repeat(80));
+  
+  // SSLCommerz sends data in req.body (form-urlencoded)
+  const { val_id, tran_id, amount, card_type, status } = req.body;
+  
+  console.log('📋 Extracted Data:');
+  console.log('  - Validation ID:', val_id);
+  console.log('  - Transaction ID:', tran_id);
+  console.log('  - Amount:', amount);
+  console.log('  - Card Type:', card_type);
+  console.log('  - Status:', status);
 
-  const result = await PaymentService.validatePaymentSuccess(val_id, tran_id);
+  if (!val_id || !tran_id) {
+    console.error('❌ Missing val_id or tran_id in callback');
+    return res.redirect(`${process.env.BASE_URL_CLIENT}/en/payment/failed?message=Invalid callback data`);
+  }
 
-  // Redirect to success page
-  res.redirect(`${process.env.BASE_URL_CLIENT}/payment/success?order=${result.order.orderNumber}`);
+  try {
+    console.log('🔄 Starting payment validation...');
+    const result = await PaymentService.validatePaymentSuccess(val_id, tran_id);
+    console.log('✅ Payment validation successful for order:', result.order.orderNumber);
+    console.log('✅ Payment Status:', result.order.paymentStatus);
+    console.log('✅ Order Status:', result.order.status);
+    
+    // Redirect to success page with order number
+    const redirectUrl = `${process.env.BASE_URL_CLIENT}/en/payment/success?order=${result.order.orderNumber}&orderId=${result.order.id}`;
+    console.log('🔀 Redirecting to:', redirectUrl);
+    res.redirect(redirectUrl);
+  } catch (error: any) {
+    console.error('❌ Payment validation error:', error.message);
+    console.error('❌ Error stack:', error.stack);
+    res.redirect(`${process.env.BASE_URL_CLIENT}/en/payment/failed?message=${encodeURIComponent(error.message)}`);
+  }
 });
 
 // SSLCommerz payment failure callback
 const sslCommerzFail = catchAsync(async (req, res) => {
+  console.log('=== SSLCommerz Failure Callback ===');
+  console.log('Request Body:', req.body);
+  
   const { tran_id } = req.body;
-
-  await PaymentService.handlePaymentFailure(tran_id);
+  
+  if (tran_id) {
+    await PaymentService.handlePaymentFailure(tran_id);
+  }
 
   // Redirect to failure page
-  res.redirect(`${process.env.BASE_URL_CLIENT}/payment/fail`);
+  res.redirect(`${process.env.BASE_URL_CLIENT}/en/payment/failed`);
 });
 
 // SSLCommerz payment cancellation callback
 const sslCommerzCancel = catchAsync(async (req, res) => {
+  console.log('=== SSLCommerz Cancellation Callback ===');
+  console.log('Request Body:', req.body);
+  
   const { tran_id } = req.body;
-
-  await PaymentService.handlePaymentCancellation(tran_id);
+  
+  if (tran_id) {
+    await PaymentService.handlePaymentCancellation(tran_id);
+  }
 
   // Redirect to cancellation page
-  res.redirect(`${process.env.BASE_URL_CLIENT}/payment/cancel`);
+  res.redirect(`${process.env.BASE_URL_CLIENT}/en/payment/cancelled`);
 });
 
 // SSLCommerz IPN handler
 const sslCommerzIPN = catchAsync(async (req, res) => {
-  await PaymentService.handleSSLCommerzIPN(req.body);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    message: 'IPN processed successfully',
-    data: null,
-  });
+  console.log('=== SSLCommerz IPN Received ===');
+  console.log('IPN Data:', req.body);
+  
+  try {
+    await PaymentService.handleSSLCommerzIPN(req.body);
+    
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'IPN processed successfully',
+      data: null,
+    });
+  } catch (error: any) {
+    console.error('IPN Processing Error:', error.message);
+    
+    sendResponse(res, {
+      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
+      message: 'IPN processing failed',
+      data: null,
+    });
+  }
 });
 
 export const PaymentController = {

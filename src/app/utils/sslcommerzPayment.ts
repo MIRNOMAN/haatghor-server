@@ -1,6 +1,5 @@
 import axios from 'axios';
 import config from '../../config';
-import { customConsole } from './customConsole';
 
 interface SSLCommerzInitData {
   total_amount: number;
@@ -19,44 +18,17 @@ interface SSLCommerzInitData {
   cus_postcode?: string;
   cus_country: string;
   cus_phone: string;
-  cus_fax?: string;
-  shipping_method?: string;
   product_name: string;
   product_category: string;
   product_profile: string;
-  ship_name?: string;
-  ship_add1?: string;
-  ship_add2?: string;
-  ship_city?: string;
-  ship_state?: string;
-  ship_postcode?: string;
-  ship_country?: string;
-  multi_card_name?: string;
   value_a?: string;
   value_b?: string;
-  value_c?: string;
-  value_d?: string;
 }
 
 interface SSLCommerzResponse {
   status: string;
   failedreason?: string;
-  sessionkey?: string;
-  gw?: {
-    visa?: string;
-    master?: string;
-    amex?: string;
-    othercards?: string;
-    internetbank?: string;
-    mobilebank?: string;
-  };
   GatewayPageURL?: string;
-  storeBanner?: string;
-  storeLogo?: string;
-  redirectGatewayURL?: string;
-  directPaymentURLBank?: string;
-  directPaymentURLCard?: string;
-  directPaymentURL?: string;
 }
 
 interface SSLCommerzValidationResponse {
@@ -64,29 +36,8 @@ interface SSLCommerzValidationResponse {
   tran_date: string;
   tran_id: string;
   val_id: string;
-  amount: string;
-  store_amount: string;
-  currency: string;
   bank_tran_id: string;
   card_type: string;
-  card_no: string;
-  card_issuer: string;
-  card_brand: string;
-  card_issuer_country: string;
-  card_issuer_country_code: string;
-  currency_type: string;
-  currency_amount: string;
-  currency_rate: string;
-  base_fair: string;
-  value_a: string;
-  value_b: string;
-  value_c: string;
-  value_d: string;
-  risk_title: string;
-  risk_level: string;
-  APIConnect?: string;
-  validated_on?: string;
-  gw_version?: string;
 }
 
 /**
@@ -110,15 +61,16 @@ export const initSSLCommerzPayment = async (
       throw new Error('SSLCommerz credentials not configured');
     }
 
-    const data = {
+    // POST data as URLSearchParams for x-www-form-urlencoded
+    const postData = new URLSearchParams({
       store_id: config.sslcommerz.store_id,
       store_passwd: config.sslcommerz.store_password,
       ...paymentData,
-    };
+    } as any).toString();
 
     const response = await axios.post<SSLCommerzResponse>(
       getSSLCommerzURL('/gwprocess/v4/api.php'),
-      data,
+      postData,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -126,7 +78,7 @@ export const initSSLCommerzPayment = async (
       },
     );
 
-    customConsole.info('SSLCommerz Init Response:', response.data);
+    console.log('SSLCommerz Init Response:', response.data);
 
     if (response.data.status === 'SUCCESS' && response.data.GatewayPageURL) {
       return {
@@ -140,7 +92,7 @@ export const initSSLCommerzPayment = async (
       error: response.data.failedreason || 'Failed to initialize payment',
     };
   } catch (error: any) {
-    customConsole.error('SSLCommerz Init Error:', error.response?.data || error.message);
+    console.error('SSLCommerz Init Error:', error.response?.data || error.message);
     return {
       success: false,
       error: error.response?.data?.failedreason || error.message || 'Payment initialization failed',
@@ -156,8 +108,11 @@ export const validateSSLCommerzPayment = async (
 ): Promise<{ success: boolean; data?: SSLCommerzValidationResponse; error?: string }> => {
   try {
     if (!config.sslcommerz.store_id || !config.sslcommerz.store_password) {
+      console.error('SSLCommerz credentials not configured');
       throw new Error('SSLCommerz credentials not configured');
     }
+
+    console.log('🔍 Validating payment with SSLCommerz, val_id:', val_id);
 
     const response = await axios.get<SSLCommerzValidationResponse>(
       getSSLCommerzURL('/validator/api/validationserverAPI.php'),
@@ -171,7 +126,11 @@ export const validateSSLCommerzPayment = async (
       },
     );
 
-    customConsole.info('SSLCommerz Validation Response:', response.data);
+    console.log('✅ SSLCommerz Validation Response:', {
+      status: response.data.status,
+      tran_id: response.data.tran_id,
+      amount: response.data.amount,
+    });
 
     if (response.data.status === 'VALID' || response.data.status === 'VALIDATED') {
       return {
@@ -180,107 +139,16 @@ export const validateSSLCommerzPayment = async (
       };
     }
 
+    console.warn('⚠️ Payment validation failed with status:', response.data.status);
     return {
       success: false,
-      error: 'Payment validation failed',
+      error: `Payment validation failed with status: ${response.data.status}`,
     };
   } catch (error: any) {
-    customConsole.error('SSLCommerz Validation Error:', error.response?.data || error.message);
+    console.error('❌ SSLCommerz Validation Error:', error.response?.data || error.message);
     return {
       success: false,
-      error: error.message || 'Payment validation failed',
-    };
-  }
-};
-
-/**
- * Check transaction status
- */
-export const checkSSLCommerzTransactionStatus = async (
-  tran_id: string,
-): Promise<{ success: boolean; data?: any; error?: string }> => {
-  try {
-    if (!config.sslcommerz.store_id || !config.sslcommerz.store_password) {
-      throw new Error('SSLCommerz credentials not configured');
-    }
-
-    const response = await axios.get(
-      getSSLCommerzURL('/validator/api/merchantTransIDvalidationAPI.php'),
-      {
-        params: {
-          tran_id: tran_id,
-          store_id: config.sslcommerz.store_id,
-          store_passwd: config.sslcommerz.store_password,
-          format: 'json',
-        },
-      },
-    );
-
-    customConsole.info('SSLCommerz Transaction Status:', response.data);
-
-    return {
-      success: true,
-      data: response.data,
-    };
-  } catch (error: any) {
-    customConsole.error('SSLCommerz Transaction Status Error:', error.response?.data || error.message);
-    return {
-      success: false,
-      error: error.message || 'Failed to check transaction status',
-    };
-  }
-};
-
-/**
- * Initiate refund
- */
-export const initiateSSLCommerzRefund = async (
-  bank_tran_id: string,
-  refund_amount: number,
-  refund_remarks: string,
-): Promise<{ success: boolean; data?: any; error?: string }> => {
-  try {
-    if (!config.sslcommerz.store_id || !config.sslcommerz.store_password) {
-      throw new Error('SSLCommerz credentials not configured');
-    }
-
-    const data = {
-      store_id: config.sslcommerz.store_id,
-      store_passwd: config.sslcommerz.store_password,
-      bank_tran_id: bank_tran_id,
-      refund_amount: refund_amount,
-      refund_remarks: refund_remarks,
-      format: 'json',
-    };
-
-    const response = await axios.post(
-      getSSLCommerzURL('/validator/api/merchantTransIDvalidationAPI.php'),
-      data,
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      },
-    );
-
-    customConsole.info('SSLCommerz Refund Response:', response.data);
-
-    if (response.data.status === 'SUCCESS') {
-      return {
-        success: true,
-        data: response.data,
-      };
-    }
-
-    return {
-      success: false,
-      error: response.data.errorReason || 'Refund initiation failed',
-    };
-  } catch (error: any) {
-    customConsole.error('SSLCommerz Refund Error:', error.response?.data || error.message);
-    return {
-      success: false,
-      error: error.message || 'Refund initiation failed',
+      error: error.response?.data?.message || error.message || 'Payment validation failed',
     };
   }
 };

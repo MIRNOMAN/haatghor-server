@@ -1,0 +1,31 @@
+model FlashSale {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  productId   String   @db.ObjectId
+  
+  // Pricing
+  originalPrice Float
+  flashPrice    Float
+  discount      Float   // Discount percentage
+  
+  // Stock
+  totalStock    Int
+  soldCount     Int     @default(0)
+  remainingStock Int
+  
+  // Time
+  startTime   DateTime
+  endTime     DateTime
+  
+  // Status
+  isActive    Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("flash_sales")
+}

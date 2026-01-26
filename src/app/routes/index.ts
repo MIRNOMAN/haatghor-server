@@ -19,6 +19,7 @@ import { ImageRoutes } from '../modules/Image/image.route';
 import { FAQRoutes } from '../modules/FAQ/faq.route';
 import { PrivacyPolicyRoutes } from '../modules/PrivacyPolicy/privacyPolicy.route';
 import { ContactUsRoutes } from '../modules/ContactUs/contactUs.route';
+import { FlashSaleRoutes } from '../modules/FlashSale/flashSale.route';
 
 const router = express.Router();
 
@@ -108,6 +109,10 @@ const moduleRoutes = [
   {
     path: '/contact',
     route: ContactUsRoutes,
+  },
+  {
+    path: '/flash-sales',
+    route: FlashSaleRoutes,
   },
 ];
 
