@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { FlashSaleService } from './flashSale.service';
-import pick from '../../utils/pick';
+import { pickValidFields } from '../../utils/pickValidFields';
 
 // Create Flash Sale (Admin)
 const createFlashSale = catchAsync(async (req, res) => {
@@ -17,8 +17,8 @@ const createFlashSale = catchAsync(async (req, res) => {
 
 // Get All Flash Sales
 const getAllFlashSales = catchAsync(async (req, res) => {
-  const filters = pick(req.query, ['searchTerm', 'isActive', 'isFeatured', 'status']);
-  const paginationOptions = pick(req.query, ['page', 'limit', 'sortBy', 'sortOrder']);
+  const filters = pickValidFields(req.query, ['searchTerm', 'isActive', 'isFeatured', 'status']);
+  const paginationOptions = pickValidFields(req.query, ['page', 'limit', 'sortBy', 'sortOrder']);
 
   const result = await FlashSaleService.getAllFlashSales(filters, paginationOptions);
 

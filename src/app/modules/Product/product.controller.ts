@@ -47,7 +47,19 @@ const getAllProducts = catchAsync(async (req, res) => {
 });
 
 const getProductById = catchAsync(async (req, res) => {
-  const result = await ProductService.getProductById(req.params.id);
+  const { id } = req.params;
+  const isMongoId = /^[a-fA-F0-9]{24}$/.test(id);
+  
+  let result;
+  if (isMongoId) {
+    result = await ProductService.getProductById(id);
+  } else {
+    result = await ProductService.getProductBySlug(id);
+  }
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
