@@ -18,12 +18,25 @@ let wss;
 export function setupWebSocketServer(server: any) {
   wss = new WebSocketServer({ server });
   wss.on('connection', async (ws: CustomWebSocket, req: Request) => {
+    console.log('🔌 New WebSocket connection attempt');
     console.log({
       connectedUser: Array.from(connectedUsers).map(item => item.userId),
     });
-    const token = req.headers.authorization;
+    
+    // Extract token from query params or authorization header
+    const url = new URL(req.url || '', `http://${req.headers.host}`);
+    const tokenFromQuery = url.searchParams.get('token');
+    const token = tokenFromQuery || req.headers.authorization;
+    
+    console.log('🔑 Token present:', !!token);
+    
     const user = await socketAuth(ws, token);
-    if (!user) return;
+    if (!user) {
+      console.log('❌ Authentication failed');
+      return;
+    }
+    
+    console.log('✅ User authenticated:', user.firstName, user.role);
 
     // if (!checkSubscription(ws, user)) return;
     if (!checkRoles(ws, user, ['ANY'])) return;
@@ -44,6 +57,10 @@ export function setupWebSocketServer(server: any) {
     const connectedUserIds = Array.from(connectedUsers)
       .map(item => item.userId)
       .filter(id => id !== undefined);
+    
+    console.log('📋 Sending conversation list to user:', userId);
+    console.log('📊 Conversations count:', formattedConversations.length);
+    
     ws.send(
       JSON.stringify({
         type: 'conversation-list',
@@ -52,15 +69,19 @@ export function setupWebSocketServer(server: any) {
     );
     ws.on('message', async (message: any) => {
       try {
-        const { type, roomId, content, fileUrl, receiverId } = JSON.parse(
-          message.toString(),
-        );
+        const parsed = JSON.parse(message.toString());
+        const { type, roomId, content, fileUrl, receiverId } = parsed;
+        
+        console.log('📨 Received message from', user.firstName, ':', type, parsed);
 
         exactRoomId = roomId;
         switch (type) {
           case 'subscribe': {
+            console.log('📌 Subscribe request:', { roomId, receiverId, userId });
             let pastMessages: Message[] = [];
+            
             if (!receiverId && !roomId) {
+              console.log('❌ Missing receiverId and roomId');
               return ws.send(
                 JSON.stringify({
                   type: 'error',
@@ -70,21 +91,44 @@ export function setupWebSocketServer(server: any) {
             }
 
             if (roomId) {
+              console.log('✅ Subscribing to existing room:', roomId);
               await readAll({ roomId, userId });
             }
 
-            if (!roomId) {
+            if (!roomId && receiverId) {
+              console.log('🆕 Creating new room for users:', userId, receiverId);
+              // Check if receiver exists
               await prisma.user.findFirstOrThrow({
                 where: {
                   id: receiverId,
                 },
               });
-              const createRoom = await prisma.room.create({
-                data: {
-                  participants: [userId, receiverId],
-                },
+              
+              // Check if room already exists
+              const existingRoom = await prisma.room.findFirst({
+                where: {
+                  AND: [
+                    { participants: { has: userId } },
+                    { participants: { has: receiverId } },
+                    { roomType: 'SINGLE' }
+                  ]
+                }
               });
-              exactRoomId = createRoom.id;
+              
+              if (existingRoom) {
+                console.log('✅ Found existing room:', existingRoom.id);
+                exactRoomId = existingRoom.id;
+              } else {
+                console.log('🆕 Creating new room');
+                const createRoom = await prisma.room.create({
+                  data: {
+                    participants: [userId, receiverId],
+                    roomType: 'SINGLE',
+                  },
+                });
+                exactRoomId = createRoom.id;
+                console.log('✅ Created room:', exactRoomId);
+              }
             }
 
             roomUsers.forEach((clients, key) => {
@@ -103,6 +147,7 @@ export function setupWebSocketServer(server: any) {
                 });
               }
             }
+            console.log('📜 Sending past messages:', pastMessages.length, 'messages');
             ws.send(
               JSON.stringify({
                 type: 'past-messages',
@@ -110,6 +155,7 @@ export function setupWebSocketServer(server: any) {
                 messages: pastMessages,
               }),
             );
+            console.log('✅ Subscription complete for room:', exactRoomId);
             break;
           }
           case 'send-message': {
@@ -178,13 +224,17 @@ export function setupWebSocketServer(server: any) {
                 },
               };
 
-              roomUsers.get(exactRoomId)?.forEach(client => {
+              const roomClients = roomUsers.get(exactRoomId);
+              console.log('📤 Broadcasting message to', roomClients?.size, 'clients in room');
+              
+              roomClients?.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
+                  console.log('✉️ Sending message to client');
                   client.send(
                     JSON.stringify({
                       type: 'new-message',
                       message: room.messages[0] || {},
-                      roomId: roomId,
+                      roomId: exactRoomId,
                     }),
                   );
                 }

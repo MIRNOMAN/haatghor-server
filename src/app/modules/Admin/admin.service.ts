@@ -180,6 +180,29 @@ const getDashboardStats = async () => {
   };
 };
 
-export const AdminService = {
-  getDashboardStats,
+const getAdminForSupport = async () => {
+  // Get the first available SUPERADMIN for customer support
+  const admin = await prisma.user.findFirst({
+    where: {
+      role: 'SUPERADMIN',
+      isDeleted: false,
+      status: 'ACTIVE',
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      profilePhoto: true,
+    },
+  });
+
+  return admin;
 };
+
+export const AdminServices = {
+  getDashboardStats,
+  getAdminForSupport,
+};
+
+// Keep backward compatibility
+export const AdminService = AdminServices;

@@ -1,6 +1,6 @@
 import express from 'express';
 import { UserRouters } from '../modules/User/user.routes';
-// import { MessageRouters } from '../modules/Messages/message.route';
+import { MessageRouters } from '../modules/Messages/message.route';
 import { NotificationsRouters } from '../modules/Notification/notification.route';
 import { AssetRouters } from '../modules/Asset/asset.route';
 import { AuthByOtpRouters } from '../modules/AuthByOtp/auth.routes';
@@ -36,10 +36,10 @@ const moduleRoutes = [
     path: '/users',
     route: UserRouters,
   },
-  // {
-  //   path: '/messages',
-  //   route: MessageRouters,
-  // },
+  {
+    path: '/messages',
+    route: MessageRouters,
+  },
   {
     path: '/notifications',
     route: NotificationsRouters,
