@@ -38,3 +38,10 @@ NotificationsRouters.patch(
   auth('ANY'),
   notificationsControllers.markAllNotificationsAsRead,
 );
+
+// Delete a specific notification for the authenticated user
+NotificationsRouters.delete(
+  '/:notificationId',
+  auth('ANY'),
+  notificationsControllers.deleteNotification,
+);

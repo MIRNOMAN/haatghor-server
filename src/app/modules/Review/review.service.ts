@@ -7,6 +7,67 @@ import { prisma } from '../../utils/prisma';
 import { ProductService } from '../Product/product.service';
 import { IReview, IReviewFilters, IUpdateReview } from './review.interface';
 
+const getAllReviews = async (
+  filters: IReviewFilters,
+  paginationOptions: IPaginationOptions,
+) => {
+  const { page, limit, skip, sortBy, sortOrder } =
+    calculatePagination(paginationOptions);
+  const { rating, isVerifiedPurchase } = filters;
+
+  const andConditions: Prisma.ReviewWhereInput[] = [];
+
+  if (rating) {
+    andConditions.push({ rating: parseInt(rating) });
+  }
+
+  if (isVerifiedPurchase !== undefined) {
+    andConditions.push({ isVerifiedPurchase: isVerifiedPurchase === 'true' });
+  }
+
+  const whereConditions: Prisma.ReviewWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.review.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePhoto: true,
+        },
+      },
+      product: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  });
+
+  const total = await prisma.review.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 const createReview = async (userId: string, payload: IReview) => {
   // Check if product exists
   const product = await prisma.product.findUnique({
@@ -257,6 +318,7 @@ const deleteReview = async (reviewId: string, userId: string) => {
 };
 
 export const ReviewService = {
+  getAllReviews,
   createReview,
   getProductReviews,
   getReviewById,

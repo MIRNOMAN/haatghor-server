@@ -150,6 +150,18 @@ const markAllNotificationsAsRead = async (userId: string) => {
   return updatedRecipients;
 };
 
+const deleteNotification = async (notificationId: string, userId: string) => {
+  // Delete the notification for the specific user
+  const deletedRecipient = await prisma.notificationUser.deleteMany({
+    where: {
+      notificationId: notificationId,
+      userId: userId,
+    },
+  });
+
+  return deletedRecipient;
+};
+
 export const notificationServices = {
   createNotification,
   getAllNotificationsByUser,
@@ -157,4 +169,5 @@ export const notificationServices = {
   markNotificationAsRead,
   getUnreadNotificationCount,
   markAllNotificationsAsRead,
+  deleteNotification,
 };

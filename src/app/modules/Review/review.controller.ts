@@ -4,6 +4,26 @@ import sendResponse from '../../utils/sendResponse';
 import { ReviewService } from './review.service';
 import { pickValidFields } from '../../utils/pickValidFields';
 
+const getAllReviews = catchAsync(async (req, res) => {
+  const filters = pickValidFields(req.query, ['rating', 'isVerifiedPurchase']);
+  const paginationOptions = pickValidFields(req.query, [
+    'page',
+    'limit',
+    'sortBy',
+    'sortOrder',
+  ]);
+
+  const result = await ReviewService.getAllReviews(filters, paginationOptions);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Reviews retrieved successfully',
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 const createReview = catchAsync(async (req, res) => {
   const userId = req.user.id;
   const result = await ReviewService.createReview(userId, req.body);
@@ -77,6 +97,7 @@ const deleteReview = catchAsync(async (req, res) => {
 });
 
 export const ReviewController = {
+  getAllReviews,
   createReview,
   getProductReviews,
   getReviewById,

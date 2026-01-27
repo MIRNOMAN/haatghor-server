@@ -6,7 +6,8 @@ import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
-// Public route
+// Public routes
+router.get('/', ReviewController.getAllReviews);
 router.get('/product/:productId', ReviewController.getProductReviews);
 router.get('/:id', ReviewController.getReviewById);
 

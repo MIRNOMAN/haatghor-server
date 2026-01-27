@@ -140,10 +140,15 @@ const updateProfileImg = async (
 
 const updateMyProfileIntoDB = async (
   id: string,
-
-  payload: Partial<User>,
+  payload: Partial<User> & { address?: string },
 ) => {
   delete payload.email;
+
+  // Map 'address' to 'location' for database compatibility
+  if ('address' in payload) {
+    (payload as any).location = payload.address;
+    delete payload.address;
+  }
 
   const result = await prisma.user.update({
     where: {

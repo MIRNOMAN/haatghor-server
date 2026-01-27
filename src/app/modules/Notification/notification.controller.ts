@@ -55,6 +55,17 @@ const markAllNotificationsAsRead = catchAsync(async (req, res) => {
   });
 });
 
+// Delete a notification for the logged-in user
+const deleteNotification = catchAsync(async (req, res) => {
+  const { notificationId } = req.params;
+  const result = await notificationServices.deleteNotification(notificationId, req.user.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Notification deleted successfully',
+    data: result,
+  });
+});
+
 
 export const notificationsControllers = {
   getAllNotifications,
@@ -62,4 +73,5 @@ export const notificationsControllers = {
   markNotificationAsRead,
   getUnreadNotificationCount,
   markAllNotificationsAsRead,
+  deleteNotification,
 };

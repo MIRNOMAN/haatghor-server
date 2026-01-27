@@ -8,7 +8,7 @@ const updateUser = z.object({
         phoneNumber: z.string().optional(),
         bio: z.string().optional(),
         location: z.string().optional(),
-        
+        address: z.string().optional(), // Alias for location (backward compatibility)
     }).strict(),
 });
 
