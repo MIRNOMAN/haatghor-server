@@ -5,6 +5,7 @@ import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
 import { prisma } from '../../utils/prisma';
 import { ProductService } from '../Product/product.service';
+import { notificationServices } from '../Notification/notification.service';
 import { IReview, IReviewFilters, IUpdateReview } from './review.interface';
 
 const getAllReviews = async (
@@ -13,7 +14,7 @@ const getAllReviews = async (
 ) => {
   const { page, limit, skip, sortBy, sortOrder } =
     calculatePagination(paginationOptions);
-  const { rating, isVerifiedPurchase } = filters;
+  const { rating, isVerifiedPurchase, status } = filters;
 
   const andConditions: Prisma.ReviewWhereInput[] = [];
 
@@ -23,6 +24,10 @@ const getAllReviews = async (
 
   if (isVerifiedPurchase !== undefined) {
     andConditions.push({ isVerifiedPurchase: isVerifiedPurchase === 'true' });
+  }
+
+  if (status) {
+    andConditions.push({ status });
   }
 
   const whereConditions: Prisma.ReviewWhereInput =
@@ -149,7 +154,7 @@ const getProductReviews = async (
 ) => {
   const { page, limit, skip, sortBy, sortOrder } =
     calculatePagination(paginationOptions);
-  const { rating, isVerifiedPurchase } = filters;
+  const { rating, isVerifiedPurchase, status } = filters;
 
   const andConditions: Prisma.ReviewWhereInput[] = [{ productId }];
 
@@ -159,6 +164,14 @@ const getProductReviews = async (
 
   if (isVerifiedPurchase !== undefined) {
     andConditions.push({ isVerifiedPurchase: isVerifiedPurchase === 'true' });
+  }
+
+  // For public API, only show approved reviews by default
+  if (status) {
+    andConditions.push({ status });
+  } else {
+    // Default to approved for public views
+    andConditions.push({ status: 'APPROVED' });
   }
 
   const whereConditions: Prisma.ReviewWhereInput =
@@ -317,6 +330,93 @@ const deleteReview = async (reviewId: string, userId: string) => {
   return null;
 };
 
+// Admin: Update review status (approve/reject)
+const updateReviewStatus = async (
+  reviewId: string,
+  status: 'APPROVED' | 'REJECTED',
+) => {
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
+  });
+
+  if (!review) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Review not found');
+  }
+
+  const result = await prisma.review.update({
+    where: { id: reviewId },
+    data: {
+      status,
+      isApproved: status === 'APPROVED',
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePhoto: true,
+          email: true,
+        },
+      },
+      product: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  });
+
+  // Update product rating if approved
+  if (status === 'APPROVED') {
+    await ProductService.updateProductRating(review.productId);
+  }
+
+  // Send notification to user
+  try {
+    const notificationMessage = status === 'APPROVED' 
+      ? `Your review for "${result.product.name}" has been approved and is now visible to other customers!`
+      : `Your review for "${result.product.name}" has been rejected. Please contact support if you have questions.`;
+
+    await notificationServices.createNotification({
+      title: status === 'APPROVED' ? 'Review Approved' : 'Review Rejected',
+      message: notificationMessage,
+      type: status === 'APPROVED' ? 'REVIEW_APPROVED' : 'REVIEW_REJECTED',
+      userIds: [result.userId],
+      redirectEndpoint: `/products/${result.product.slug}`,
+    });
+  } catch (error) {
+    console.error('Failed to send review status notification:', error);
+    // Don't throw error - notification failure shouldn't break the review update
+  }
+
+  return result;
+};
+
+// Admin: Delete any review
+const adminDeleteReview = async (reviewId: string) => {
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
+  });
+
+  if (!review) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Review not found');
+  }
+
+  const productId = review.productId;
+
+  await prisma.review.delete({
+    where: { id: reviewId },
+  });
+
+  // Update product rating
+  await ProductService.updateProductRating(productId);
+
+  return null;
+};
+
 export const ReviewService = {
   getAllReviews,
   createReview,
@@ -324,4 +424,6 @@ export const ReviewService = {
   getReviewById,
   updateReview,
   deleteReview,
+  updateReviewStatus,
+  adminDeleteReview,
 };

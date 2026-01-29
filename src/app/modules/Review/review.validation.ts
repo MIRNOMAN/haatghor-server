@@ -21,7 +21,16 @@ const updateReviewValidation = z.object({
   }),
 });
 
+const updateReviewStatusValidation = z.object({
+  body: z.object({
+    status: z.enum(['APPROVED', 'REJECTED'], {
+      required_error: 'Status is required',
+    }),
+  }),
+});
+
 export const ReviewValidation = {
   createReviewValidation,
   updateReviewValidation,
+  updateReviewStatusValidation,
 };

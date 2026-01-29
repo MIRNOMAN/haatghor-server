@@ -8,6 +8,7 @@
         "@aws-sdk/client-s3": "^3.936.0",
         "@aws-sdk/lib-storage": "^3.936.0",
         "@prisma/client": "^6.19.2",
+        "@types/socket.io": "^3.0.2",
         "axios": "^1.13.2",
         "bcrypt": "^6.0.0",
         "cors": "^2.8.5",
@@ -20,7 +21,7 @@
         "multer": "^2.0.2",
         "nanoid": "^5.1.6",
         "nodemailer": "^7.0.10",
-        "socket.io": "^4.8.1",
+        "socket.io": "^4.8.3",
         "stripe": "^18.5.0",
         "ts-node-dev": "^2.0.0",
         "ws": "^8.18.3",
@@ -382,6 +383,8 @@
     "@types/send": ["@types/send@1.2.1", "", { "dependencies": { "@types/node": "*" } }, "sha512-arsCikDvlU99zl1g69TcAB3mzZPpxgw0UQnaHeC1Nwb015xp8bknZv5rIfri9xTOcMuaVgvabfIRA7PSZVuZIQ=="],
 
     "@types/serve-static": ["@types/serve-static@2.2.0", "", { "dependencies": { "@types/http-errors": "*", "@types/node": "*" } }, "sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ=="],
+
+    "@types/socket.io": ["@types/socket.io@3.0.2", "", { "dependencies": { "socket.io": "*" } }, "sha512-pu0sN9m5VjCxBZVK8hW37ZcMe8rjn4HHggBN5CbaRTvFwv5jOmuIRZEuddsBPa9Th0ts0SIo3Niukq+95cMBbQ=="],
 
     "@types/strip-bom": ["@types/strip-bom@3.0.0", "", {}, "sha512-xevGOReSYGM7g/kUBZzPqCrR/KYAo+F0yiPc85WFTJa0MSLtyFTVTU6cJu/aV4mid7IffDIWqo69THF2o4JiEQ=="],
 

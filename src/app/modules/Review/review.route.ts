@@ -11,7 +11,7 @@ router.get('/', ReviewController.getAllReviews);
 router.get('/product/:productId', ReviewController.getProductReviews);
 router.get('/:id', ReviewController.getReviewById);
 
-// Protected routes
+// User routes
 router.post(
   '/',
   auth('USER', 'SUPERADMIN'),
@@ -30,6 +30,20 @@ router.delete(
   '/:id',
   auth('USER', 'SUPERADMIN'),
   ReviewController.deleteReview,
+);
+
+// Admin routes (SUPERADMIN only)
+router.patch(
+  '/:id/status',
+  auth('SUPERADMIN'),
+  validateRequest.body(ReviewValidation.updateReviewStatusValidation),
+  ReviewController.updateReviewStatus,
+);
+
+router.delete(
+  '/:id/admin',
+  auth('SUPERADMIN'),
+  ReviewController.adminDeleteReview,
 );
 
 export const ReviewRoutes = router;

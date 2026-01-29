@@ -5,7 +5,7 @@ import { ReviewService } from './review.service';
 import { pickValidFields } from '../../utils/pickValidFields';
 
 const getAllReviews = catchAsync(async (req, res) => {
-  const filters = pickValidFields(req.query, ['rating', 'isVerifiedPurchase']);
+  const filters = pickValidFields(req.query, ['rating', 'isVerifiedPurchase', 'status']);
   const paginationOptions = pickValidFields(req.query, [
     'page',
     'limit',
@@ -96,6 +96,31 @@ const deleteReview = catchAsync(async (req, res) => {
   });
 });
 
+// Admin: Update review status
+const updateReviewStatus = catchAsync(async (req, res) => {
+  const { status } = req.body;
+  const result = await ReviewService.updateReviewStatus(req.params.id, status);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Review ${status.toLowerCase()} successfully`,
+    data: result,
+  });
+});
+
+// Admin: Delete any review
+const adminDeleteReview = catchAsync(async (req, res) => {
+  await ReviewService.adminDeleteReview(req.params.id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Review deleted successfully',
+    data: null,
+  });
+});
+
 export const ReviewController = {
   getAllReviews,
   createReview,
@@ -103,4 +128,6 @@ export const ReviewController = {
   getReviewById,
   updateReview,
   deleteReview,
+  updateReviewStatus,
+  adminDeleteReview,
 };

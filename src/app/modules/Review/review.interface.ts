@@ -15,4 +15,9 @@ export interface IReviewFilters {
   productId?: string;
   rating?: string;
   isVerifiedPurchase?: string;
+  status?: 'PENDING' | 'APPROVED' | 'REJECTED';
+}
+
+export interface IUpdateReviewStatus {
+  status: 'APPROVED' | 'REJECTED';
 }

@@ -92,6 +92,7 @@ export function setupWebSocketServer(server: any) {
 
             if (roomId) {
               console.log('✅ Subscribing to existing room:', roomId);
+              exactRoomId = roomId; // FIX: Set exactRoomId when subscribing to existing room
               await readAll({ roomId, userId });
             }
 
@@ -144,6 +145,16 @@ export function setupWebSocketServer(server: any) {
                 pastMessages = await prisma.message.findMany({
                   where: { roomId: exactRoomId },
                   orderBy: { createdAt: 'desc' },
+                  include: {
+                    sender: {
+                      select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        profilePhoto: true,
+                      }
+                    }
+                  }
                 });
               }
             }
@@ -196,6 +207,16 @@ export function setupWebSocketServer(server: any) {
                       createdAt: 'desc',
                     },
                     take: 1,
+                    include: {
+                      sender: {
+                        select: {
+                          id: true,
+                          firstName: true,
+                          lastName: true,
+                          profilePhoto: true,
+                        }
+                      }
+                    }
                   },
                 },
               });
