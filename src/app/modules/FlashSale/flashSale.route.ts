@@ -14,18 +14,22 @@ router.get('/', FlashSaleController.getAllFlashSales);
 // Admin routes
 router.post(
   '/',
-  auth('ADMIN'),
+  auth('ADMIN', 'SUPERADMIN'),
   validateRequest.body(FlashSaleValidation.createFlashSaleSchema),
   FlashSaleController.createFlashSale,
 );
 
 router.patch(
   '/:id',
-  auth('ADMIN'),
+  auth('ADMIN', 'SUPERADMIN'),
   validateRequest.body(FlashSaleValidation.updateFlashSaleSchema),
   FlashSaleController.updateFlashSale,
 );
 
-router.delete('/:id', auth('ADMIN'), FlashSaleController.deleteFlashSale);
+router.delete(
+  '/:id',
+  auth('ADMIN', 'SUPERADMIN'),
+  FlashSaleController.deleteFlashSale,
+);
 
 export const FlashSaleRoutes = router;
