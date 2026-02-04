@@ -26,16 +26,16 @@ const getAllFAQs = async (
 ) => {
   const { page, limit, skip, sortBy, sortOrder } =
     calculatePagination(paginationOptions);
-  const { searchTerm, category, isActive } = filters;
+  const { search, searchTerm, category, isActive } = filters;
 
   const andConditions: Prisma.FAQWhereInput[] = [];
-
+const keyword = searchTerm || search;
   // Search term
-  if (searchTerm) {
+  if (keyword) {
     andConditions.push({
       OR: [
-        { question: { contains: searchTerm, mode: 'insensitive' } },
-        { answer: { contains: searchTerm, mode: 'insensitive' } },
+        { question: { contains: keyword, mode: 'insensitive' } },
+        { answer: { contains: keyword, mode: 'insensitive' } },
       ],
     });
   }

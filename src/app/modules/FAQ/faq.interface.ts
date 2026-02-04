@@ -9,6 +9,7 @@ export interface IFAQ {
 
 export interface IFAQFilters {
   searchTerm?: string;
+  search?: string;
   category?: string;
   isActive?: string;
 }

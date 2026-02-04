@@ -17,12 +17,23 @@ const createContactUs = catchAsync(async (req, res) => {
 });
 
 const getAllContactUs = catchAsync(async (req, res) => {
-  const filters = pickValidFields(req.query, [
+  const rawFilters = pickValidFields(req.query, [
     'searchTerm',
     'status',
     'isRead',
     'email',
   ]);
+
+  const filters = {
+    ...rawFilters,
+    status:
+      rawFilters.status &&
+      Object.values(ContactStatus).includes(
+        rawFilters.status as ContactStatus
+      )
+        ? (rawFilters.status as ContactStatus)
+        : undefined,
+  };
 
   const paginationOptions = pickValidFields(req.query, [
     'page',
@@ -44,6 +55,7 @@ const getAllContactUs = catchAsync(async (req, res) => {
     data: result.data,
   });
 });
+
 
 const getContactUsById = catchAsync(async (req, res) => {
   const result = await ContactUsService.getContactUsById(req.params.id);

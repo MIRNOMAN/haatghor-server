@@ -45,9 +45,11 @@ const getAllContactUs = async (
   }
 
   // Status filter
-  if (status) {
-    andConditions.push({ status: status as ContactStatus });
-  }
+if (status && Object.values(ContactStatus).includes(status as ContactStatus)) {
+  andConditions.push({
+    status: status as ContactStatus,
+  });
+}
 
   // Email filter
   if (email) {

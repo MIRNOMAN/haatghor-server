@@ -15,8 +15,8 @@ export interface IContactUs {
 }
 
 export interface IContactUsFilters {
-  searchTerm?: string;
-  status?: string;
+   searchTerm?: string;
+  status?: ContactStatus;
   isRead?: string;
   email?: string;
 }

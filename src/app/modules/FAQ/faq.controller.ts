@@ -17,6 +17,7 @@ const createFAQ = catchAsync(async (req, res) => {
 
 const getAllFAQs = catchAsync(async (req, res) => {
   const filters = pickValidFields(req.query, [
+    'search',
     'searchTerm',
     'category',
     'isActive',
