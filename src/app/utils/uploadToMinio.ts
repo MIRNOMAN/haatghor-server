@@ -1,6 +1,6 @@
 import * as Minio from 'minio';
 import config from '../../config';
-import { nanoid } from 'nanoid';
+import { randomUUID } from 'crypto';
 import httpStatus from 'http-status';
 import AppError from '../errors/AppError';
 
@@ -36,7 +36,8 @@ export const uploadToMinIO = async <T extends MulterFile | MulterFile[]>(
 
     for (const file of filesArray) {
         try {
-            const fileName = `${teamName}/${folder}/${file.originalname.split(/\.(?=[^\.]+$)/)[0]}-${nanoid(6)}.${file.originalname.split('.').pop()}`;
+            const id = randomUUID().replace(/-/g, '').slice(0, 6);
+            const fileName = `${teamName}/${folder}/${file.originalname.split(/\.(?=[^\.]+$)/)[0]}-${id}.${file.originalname.split('.').pop()}`;
 
             const metaData = {
                 'Content-Type': file.mimetype,

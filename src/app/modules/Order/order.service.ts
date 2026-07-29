@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import httpStatus from 'http-status';
-import { nanoid } from 'nanoid';
+import { randomUUID } from 'crypto';
 import AppError from '../../errors/AppError';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { calculatePagination } from '../../utils/calculatePagination';
@@ -65,7 +65,7 @@ const createOrder = async (userId: string, payload: ICreateOrder) => {
   const finalAmount = subtotal + deliveryCharge;
 
   // Generate order number
-  const orderNumber = `ORD-${nanoid(10).toUpperCase()}`;
+  const orderNumber = `ORD-${randomUUID().replace(/-/g, '').slice(0, 10).toUpperCase()}`;
 
   // Create order in transaction
   const result = await prisma.$transaction(async tx => {

@@ -14,21 +14,21 @@ router.get('/', FlashSaleController.getAllFlashSales);
 // Admin routes
 router.post(
   '/',
-  auth('ADMIN', 'SUPERADMIN'),
+  auth('SUPERADMIN'),
   validateRequest.body(FlashSaleValidation.createFlashSaleSchema),
   FlashSaleController.createFlashSale,
 );
 
 router.patch(
   '/:id',
-  auth('ADMIN', 'SUPERADMIN'),
+  auth('SUPERADMIN'),
   validateRequest.body(FlashSaleValidation.updateFlashSaleSchema),
   FlashSaleController.updateFlashSale,
 );
 
 router.delete(
   '/:id',
-  auth('ADMIN', 'SUPERADMIN'),
+  auth('SUPERADMIN'),
   FlashSaleController.deleteFlashSale,
 );
 

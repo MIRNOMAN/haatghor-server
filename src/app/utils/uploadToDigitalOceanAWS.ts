@@ -3,8 +3,8 @@ import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client
 import fs from "fs";
 import config from "../../config";
 import { Readable } from "stream";
+import { randomUUID } from 'crypto';
 import AppError from "../errors/AppError";
-import { nanoid } from 'nanoid';
 
 
 const s3Client = new S3Client({
@@ -36,7 +36,8 @@ export const uploadToCloudStorage = async <T extends MulterFile | MulterFile[]>(
         : fs.createReadStream(file.path);
 
       const subFolder = file.mimetype.split("/")[0];
-      const key = `${file.originalname.split(/\.(?=[^\.]+$)/)[0]}_${nanoid(6)}}`;
+      const id = randomUUID().replace(/-/g, '').slice(0, 6);
+      const key = `${file.originalname.split(/\.(?=[^\.]+$)/)[0]}_${id}`;
 
       const command = new PutObjectCommand({
         Bucket: process.env.DO_SPACE_BUCKET!,

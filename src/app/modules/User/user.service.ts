@@ -1,5 +1,5 @@
-import { User } from '@/generated/client';
 import { UserRoleEnum, UserStatus } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { Request } from 'express';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
